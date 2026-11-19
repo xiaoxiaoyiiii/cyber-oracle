@@ -111,6 +111,18 @@
       filter: drop-shadow(0 0 14px rgba(245, 197, 66, 0.75));
     }
 
+    @keyframes tubeRattle {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      20% { transform: rotate(-6deg) translateY(-4px); }
+      40% { transform: rotate(6deg) translateY(2px); }
+      60% { transform: rotate(-5deg) translateY(-3px); }
+      80% { transform: rotate(4deg) translateY(1px); }
+    }
+
+    .tube-rattling {
+      animation: tubeRattle 0.22s ease-in-out infinite;
+    }
+
     .glass-panel {
       background: var(--bg-card);
       backdrop-filter: blur(14px);
@@ -202,6 +214,9 @@
         </button>
         <button id="tabDecide" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer">
           🎲 决断问事
+        </button>
+        <button id="tabStick" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer">
+          🎋 灵签求问
         </button>
       </div>
       <button id="btnMerit" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 border border-amber-400/25 active:scale-95 transition cursor-pointer">
@@ -822,6 +837,129 @@
         </div>
       </div>
     </section>
+
+    <!-- VIEW 6: Bamboo Fortune Stick Tube (🎋 灵签求问) -->
+    <section id="viewStick" class="hidden space-y-5">
+      <div class="glass-panel gold-border-glow rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div>
+            <h2 class="font-serif-cn text-lg font-bold text-amber-300">赛博灵签筒 · 六十甲子典故签</h2>
+            <p class="text-xs text-slate-400 mt-0.5">遵循传统庙宇仪轨：一摇签筒出签号 → 二掷圣杯确认 → 三解古风典故签诗。</p>
+          </div>
+          <span class="font-mono-tech text-[11px] text-emerald-300">LOT // 60-JIAZI</span>
+        </div>
+
+        <div>
+          <label for="stickQuestion" class="block text-xs text-slate-400 mb-1.5">心中所求之事（选填，默念即可）</label>
+          <input id="stickQuestion" type="text" maxlength="40" placeholder="例如：近期学业/搞钱/桃花运势如何？" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center bg-black/35 rounded-2xl p-5 border border-white/10">
+          <!-- Bamboo Tube Visual -->
+          <div class="md:col-span-5 flex flex-col items-center justify-center">
+            <div id="stickTubeWrap" class="relative w-32 h-44 flex flex-col items-center justify-end select-none">
+              <!-- Popped stick -->
+              <div id="poppedStick" class="hidden absolute -top-2 w-7 h-24 rounded-t-md bg-gradient-to-b from-amber-300 to-amber-600 border border-amber-200 shadow-[0_0_15px_rgba(245,197,66,0.7)] flex items-center justify-center transition-all duration-500 z-10">
+                <span id="poppedStickNum" class="font-serif-cn text-[11px] font-black text-slate-950 [writing-mode:vertical-rl]">第壹签</span>
+              </div>
+              <!-- Sticks bundle inside tube -->
+              <div class="flex items-end justify-center gap-1 mb-[-10px] z-0">
+                <div class="w-2 h-14 bg-amber-700/80 rounded-t rotate-[-10deg]"></div>
+                <div class="w-2 h-16 bg-amber-600/80 rounded-t rotate-[-4deg]"></div>
+                <div class="w-2 h-15 bg-amber-500/80 rounded-t rotate-[2deg]"></div>
+                <div class="w-2 h-16 bg-amber-700/80 rounded-t rotate-[6deg]"></div>
+                <div class="w-2 h-14 bg-amber-600/80 rounded-t rotate-[11deg]"></div>
+              </div>
+              <!-- Tube body -->
+              <div class="relative z-10 w-24 h-28 rounded-b-2xl rounded-t-md bg-gradient-to-b from-amber-900/90 via-stone-900 to-black border-2 border-amber-500/50 shadow-xl flex flex-col items-center justify-center">
+                <div class="w-10 h-10 rounded-full border border-amber-400/50 flex items-center justify-center font-serif-cn text-amber-300 font-black text-lg">签</div>
+                <div class="text-[9px] font-mono-tech text-cyan-300/70 mt-1">CYBER-LOT</div>
+              </div>
+            </div>
+            <div id="stickStageHint" class="text-xs text-slate-400 mt-3 text-center">点击或长按右侧按钮摇动签筒</div>
+          </div>
+
+          <!-- Controls & Step 2 Confirmation -->
+          <div class="md:col-span-7 space-y-3">
+            <button id="btnShakeTube" type="button" class="relative overflow-hidden select-none touch-none w-full py-3.5 rounded-xl font-serif-cn text-sm font-bold bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-400 text-slate-950 shadow-lg shadow-amber-500/20 hover:brightness-110 transition cursor-pointer">
+              <span id="stickChargeBar" class="absolute inset-y-0 left-0 w-0 bg-white/40 pointer-events-none transition-none"></span>
+              <span class="relative z-10">🎋 诚心摇签筒（可长按蓄力）</span>
+            </button>
+
+            <!-- Step 2: Moon Block Confirm Box -->
+            <div id="stickConfirmBox" class="hidden p-4 rounded-xl bg-white/5 border border-amber-400/30 space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <span id="stickConfirmTitle" class="font-serif-cn text-sm font-bold text-amber-200">已摇出第 01 签（甲子签）</span>
+                <span id="stickConfirmStatus" class="text-[11px] font-mono-tech text-cyan-300">待掷圣杯确认</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                按古礼，摇出签号后需向神明掷出一对圣杯（一阳一阴）确认此签归属；若掷出笑杯/阴杯，可重摇签筒或再掷一次。
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <button id="btnConfirmStick" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-500/25 hover:bg-rose-500/35 text-rose-200 border border-rose-400/40 transition cursor-pointer">
+                  🙏 掷圣杯确认此签
+                </button>
+                <button id="btnForceUnlockStick" type="button" class="hidden px-3 py-2 rounded-xl text-xs font-medium bg-white/10 hover:bg-white/15 text-slate-300 border border-white/15 transition cursor-pointer">
+                  ⚡ 赛博豁免直接解签
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Unlocked Fortune Stick Result Card -->
+      <div id="stickResultCard" class="hidden glass-panel rounded-2xl p-5 sm:p-6 border border-amber-400/30 space-y-4">
+        <div id="sharedStickBanner" class="hidden px-3.5 py-2 rounded-xl bg-cyan-500/15 border border-cyan-400/35 text-xs text-cyan-200 flex items-center justify-between gap-2">
+          <span id="sharedStickText">👀 正在围观好友求得的灵签</span>
+          <button id="btnPlayOwnStick" type="button" class="shrink-0 px-3 py-1 rounded-lg bg-amber-400 text-slate-950 font-semibold cursor-pointer">✨ 我也要抽一签</button>
+        </div>
+
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-1.5">
+              <span id="stickResBadge" class="text-xs font-mono-tech px-2.5 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30">第 01 签 · 甲子签</span>
+              <span id="stickResTier" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/30">上上签</span>
+            </div>
+            <h3 id="stickResAllusion" class="font-serif-cn text-2xl font-black text-amber-200">典故：姜太公渭水钓鱼</h3>
+            <p id="stickResQuestionEcho" class="text-xs text-slate-400 mt-1"></p>
+          </div>
+        </div>
+
+        <!-- 4-line Poem -->
+        <div class="p-4 rounded-xl bg-black/45 border border-amber-400/20 text-center">
+          <div id="stickResPoem" class="font-serif-cn text-base sm:text-lg text-amber-100 leading-loose tracking-wider"></div>
+        </div>
+
+        <!-- Allusion Meaning + Cyber Roast -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-1.5">
+            <div class="text-xs font-bold text-cyan-300">📜 典故释义</div>
+            <p id="stickResMeaning" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+          </div>
+          <div class="p-4 rounded-xl bg-white/[0.03] border border-amber-400/20 space-y-1.5">
+            <div class="text-xs font-bold text-amber-300">🤖 玄机子赛博吐槽</div>
+            <p id="stickResRoast" class="text-xs sm:text-sm text-slate-200 leading-relaxed"></p>
+          </div>
+        </div>
+
+        <div id="stickResDetails" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs"></div>
+
+        <div class="flex flex-wrap justify-between gap-2 pt-1">
+          <button id="btnResetStick" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition cursor-pointer">
+            ↺ 再求一签
+          </button>
+          <div class="flex flex-wrap gap-2">
+            <button id="btnShareStick" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 transition cursor-pointer">
+              🔗 复制灵签链接
+            </button>
+            <button id="btnCopyStick" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 transition cursor-pointer">
+              📋 复制签诗
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Poster Preview Modal -->
@@ -896,6 +1034,11 @@
       playBwei() {
         this.playTone(580, 0.08, 'triangle', 0.12, 0);
         this.playTone(490, 0.10, 'triangle', 0.10, 0.09);
+      },
+      playBamboo() {
+        [0, 0.06, 0.13, 0.21].forEach((d, i) => {
+          this.playTone(760 + i * 95, 0.055, 'triangle', 0.08, d);
+        });
       },
       playChargeStep(pct) {
         this.playTone(280 + pct * 4.5, 0.05, 'sine', 0.035, 0);
@@ -2022,6 +2165,12 @@
           $('sharedMatchBanner').classList.remove('hidden');
           $('sharedMatchText').textContent = `👀 正在围观【${p.a} × ${p.b}】的合盘结果（${p.sc}%）`;
           state.lastMatchData = p;
+        } else if (h.startsWith('#k=')) {
+          const p = decodeSharePayload(h.slice(3));
+          const stick = STICK_DECK[p.idx] || STICK_DECK[0];
+          $('tabStick').click();
+          $('stickQuestion').value = p.q || '';
+          renderStickCard(stick, p.q || '', true);
         } else if (h.startsWith('#d=')) {
           const p = decodeSharePayload(h.slice(3));
           $('tabDecide').click();
@@ -2051,21 +2200,238 @@
         const tabs = {
           tabSingle: 'bg-amber-400 text-slate-950',
           tabMatch: 'bg-cyan-400 text-slate-950',
-          tabDecide: 'bg-rose-400 text-slate-950'
+          tabDecide: 'bg-rose-400 text-slate-950',
+          tabStick: 'bg-emerald-400 text-slate-950'
         };
         Object.keys(tabs).forEach(id => {
           $(id).className = `px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${id === activeId ? tabs[id] : 'text-slate-300 hover:text-white'}`;
         });
-        ['viewInput', 'viewRitual', 'viewResult', 'viewMatch', 'viewDecide'].forEach(v => $(v).classList.add('hidden'));
+        ['viewInput', 'viewRitual', 'viewResult', 'viewMatch', 'viewDecide', 'viewStick'].forEach(v => $(v).classList.add('hidden'));
         if (activeId === 'tabSingle') $('viewInput').classList.remove('hidden');
         if (activeId === 'tabMatch') $('viewMatch').classList.remove('hidden');
         if (activeId === 'tabDecide') $('viewDecide').classList.remove('hidden');
+        if (activeId === 'tabStick') $('viewStick').classList.remove('hidden');
         SoundFX.playTick();
       }
 
       $('tabSingle').addEventListener('click', () => switchModeTab('tabSingle'));
       $('tabMatch').addEventListener('click', () => switchModeTab('tabMatch'));
       $('tabDecide').addEventListener('click', () => switchModeTab('tabDecide'));
+      $('tabStick').addEventListener('click', () => switchModeTab('tabStick'));
+
+      // =====================================================================
+      // 8.5 Bamboo Fortune-Stick Tube (灵签求问)
+      // =====================================================================
+      const STICK_DECK = [
+        {
+          no: '第 01 签', jiazi: '甲子签', tier: '上上签',
+          allusion: '姜太公渭水钓鱼',
+          poem: '直钩垂钓渭水滨，不求凡鱼只待君。\n云开雾散终有日，一朝风起跃龙门。',
+          meaning: '姜太公隐居渭水以直钩垂钓，看似毫无进展，实则在等待真正赏识自己的明主与时机。此签主先沉潜后爆发。',
+          roast: '别焦虑别人已经拿了几个 Offer 或发了多少爆款！你现在属于「直钩蓄力期」，把底层硬实力攒够了，伯乐和风口自己会找上门。',
+          career: '厚积薄发，适合打磨核心作品或啃硬核技术。',
+          wealth: '正财稳步上升，忌急功近利跟风投资。',
+          love: '宁缺毋滥，对的人正在路上，别将就。'
+        },
+        {
+          no: '第 07 签', jiazi: '庚午签', tier: '上吉',
+          allusion: '诸葛亮草船借箭',
+          poem: '大雾漫江不见船，巧借东风万箭全。\n莫愁眼前无路走，借力打力自成仙。',
+          meaning: '诸葛亮借助天时地利与对手的资源完成不可能的任务。此签提醒你不必事事单打独斗，懂得借势与整合资源就能破局。',
+          roast: '遇到卡死的需求或难题别一个人硬肝到凌晨！去翻翻开源库、问问群友或者找靠谱搭子借个力，十分钟就能解决你三小时的痛苦。',
+          career: '善用工具与团队协作，事半功倍。',
+          wealth: '合作生财，有贵人或朋友带来好机会。',
+          love: '多通过朋友局或共同爱好互动，容易擦出火花。'
+        },
+        {
+          no: '第 14 签', jiazi: '丁丑签', tier: '中吉',
+          allusion: '苏秦游说六国',
+          poem: '黄金散尽志未休，寒窗悬梁苦追求。\n一朝佩印六国相，始信人间有回头。',
+          meaning: '苏秦最初游说失败散尽家财，回家发奋苦读后再出山终成大器。此签主「前期遇冷莫气馁，复盘迭代必翻盘」。',
+          roast: '哪怕上次投稿凉了、面试挂了或者表白被已读不回，真不算啥！把错题和槽点复盘一遍，换个版本再战，打脸时刻就在后面。',
+          career: '前期略曲折，复盘改进后迎来明显上升。',
+          wealth: '先投入后回报，别舍不得买好工具或学习资料。',
+          love: '真诚加上一点幽默感，比死缠烂打管用得多。'
+        },
+        {
+          no: '第 21 签', jiazi: '甲申签', tier: '中平',
+          allusion: '张良圯桥拾履',
+          poem: '桥边拾履忍须臾，老父授书意自殊。\n莫怪眼前规矩多，磨去浮躁见真途。',
+          meaning: '张良在桥边三次忍耐替黄石公捡鞋穿鞋，最终得到《太公兵法》。此签主「沉住气、忍小烦，后面必有真传」。',
+          roast: '今天大概率会遇到一个让你血压微微上升的甲方、队友或者奇葩需求。深呼吸默念三遍「莫生气」，忍过去这波会有隐藏奖励！',
+          career: '细节决定成败，耐心改完这一版就是胜利。',
+          wealth: '守财为主，避免因情绪上头乱花钱。',
+          love: '多倾听少抬杠，给彼此多留一点耐心。'
+        },
+        {
+          no: '第 28 签', jiazi: '辛卯签', tier: '上上签',
+          allusion: '伯牙子期高山流水',
+          poem: '一曲高山流水长，千金易得觅知音。\n莫愁前路无相识，自有同频共抚琴。',
+          meaning: '俞伯牙与钟子期因琴音相知，象征遇到真正懂你、志同道合的知己或黄金搭档。',
+          roast: '近期社交磁场超好！你随口抛出的一个抽象梗，对面居然能秒接住——遇到这种脑电波完全同频的朋友或对象，一定要抓紧！',
+          career: '极易遇到赏识你才华的导师、老板或合作伙伴。',
+          wealth: '口碑变现，好名声会带来意想不到的好单子。',
+          love: '灵魂共振极强，聊天停不下来就是心动信号。'
+        },
+        {
+          no: '第 35 签', jiazi: '戊戌签', tier: '中吉',
+          allusion: '范蠡泛舟五湖',
+          poem: '功成身退泛轻舟，烟波浩渺任自由。\n懂得见好就收处，何须苦苦恋高楼。',
+          meaning: '范蠡辅佐越王灭吴后急流勇退、泛舟五湖并成为巨富陶朱公。此签提醒你「懂得切换赛道与见好就收」。',
+          roast: '这把连胜了两局就赶紧见好就收去睡觉吧！或者手头一个已经跑通的项目别再过度魔改了，及时上线收割一波好评最香。',
+          career: '适合阶段性收尾与总结，别在边缘细节无限内耗。',
+          wealth: '落袋为安，见好就收才是真赢家。',
+          love: '保持适度留白与神秘感，别把所有底牌一次摊完。'
+        },
+        {
+          no: '第 42 签', jiazi: '乙巳签', tier: '上吉',
+          allusion: '李白醉酒赋清平调',
+          poem: '云想衣裳花想容，春风拂槛露华浓。\n天生我才必有用，灵光一现破长空。',
+          meaning: '李白受召入宫挥毫写就千古绝句，主「才华显露、创意爆发」。适合一切创作、表达与展示。',
+          roast: '今日文曲星和灵感之神同时附体！别管什么条条框框了，想到什么好点子赶紧记下来或者直接开干，成片/成品效果绝对炸裂。',
+          career: '创意、文案、代码架构灵感爆棚，抓紧输出。',
+          wealth: '靠手艺与脑洞赚钱，副业/创作运势看涨。',
+          love: '夸人夸到心坎里，文字魅力大爆发。'
+        },
+        {
+          no: '第 49 签', jiazi: '壬子签', tier: '下下签（逆袭版）',
+          allusion: '越王勾践卧薪尝胆',
+          poem: '苦心人天终不负，三千越甲可吞吴。\n眼前纵有千般阻，留得青山好起炉。',
+          meaning: '越王勾践经历战败低谷后卧薪尝胆，最终东山再起。签面虽为下下，实则是「触底反弹、绝地逆袭」之大兆。',
+          roast: '恭喜抽到稀有的「逆袭剧本体验卡」！最近如果觉得有点诸事不顺，说明霉运已经到底了——今晚早点睡，明天开始全线反弹！',
+          career: '低谷蓄力期，千万别因为一时受挫就自我否定。',
+          wealth: '严格管住钱包，严禁借贷或冲动消费。',
+          love: '先把自己照顾好、变优秀，好缘分自然会回来。'
+        },
+        {
+          no: '第 56 签', jiazi: '己未签', tier: '中平',
+          allusion: '陶渊明采菊东篱下',
+          poem: '采菊东篱下，悠然见南山。\n世事纷扰由它去，偷得半日赛神仙。',
+          meaning: '陶渊明不为五斗米折腰，回归田园享受内心平静。此签主「放慢脚步、拒绝无意义内卷」。',
+          roast: '天道检测到你最近脑子转太快有点过热，强制给你下发「合法摸鱼许可证」！今天少卷两小时，去吃顿好吃的散散步比啥都强。',
+          career: '劳逸结合，休息好了效率才会高。',
+          wealth: '知足常乐，别被别人的消费主义带偏。',
+          love: '细水长流的陪伴比轰轰烈烈更长久。'
+        }
+      ];
+
+      let pendingStick = null;
+      let stickConfirmFails = 0;
+      let lastStickText = '';
+
+      function renderStickCard(stick, question, isShared = false) {
+        $('stickResultCard').classList.remove('hidden');
+        $('stickResBadge').textContent = `${stick.no} · ${stick.jiazi}`;
+        $('stickResTier').textContent = stick.tier;
+        $('stickResAllusion').textContent = `典故：${stick.allusion}`;
+        $('stickResQuestionEcho').textContent = question ? `所求之事：「${question}」` : '诚心求问 · 心诚则灵';
+        $('stickResPoem').innerHTML = stick.poem.replace(/\n/g, '<br/>');
+        $('stickResMeaning').textContent = stick.meaning;
+        $('stickResRoast').textContent = stick.roast;
+        $('stickResDetails').innerHTML = `
+          <div class="p-3 rounded-xl bg-black/35 border border-white/10"><span class="text-amber-300 font-bold">💼 事业学业：</span><span class="text-slate-300">${stick.career}</span></div>
+          <div class="p-3 rounded-xl bg-black/35 border border-white/10"><span class="text-emerald-300 font-bold">💰 财运走势：</span><span class="text-slate-300">${stick.wealth}</span></div>
+          <div class="p-3 rounded-xl bg-black/35 border border-white/10"><span class="text-rose-300 font-bold">🌸 感情人际：</span><span class="text-slate-300">${stick.love}</span></div>
+        `;
+        if (isShared) {
+          $('sharedStickBanner').classList.remove('hidden');
+          $('sharedStickText').textContent = `👀 正在围观好友求得的【${stick.no} · ${stick.allusion}】`;
+        } else {
+          $('sharedStickBanner').classList.add('hidden');
+        }
+        state.lastStickData = { idx: STICK_DECK.indexOf(stick), q: question || '' };
+        lastStickText = `【天机终端 · 灵签求问】\n${stick.no}（${stick.jiazi} · ${stick.tier}）\n典故：${stick.allusion}\n签诗：${stick.poem.replace(/\n/g, ' / ')}\n玄机子吐槽：${stick.roast}`;
+      }
+
+      bindChargeAction({
+        btnId: 'btnShakeTube',
+        barId: 'stickChargeBar',
+        targetsFn: () => [$('stickTubeWrap')],
+        onTrigger: charged => {
+          SoundFX.playBamboo();
+          const tube = $('stickTubeWrap');
+          tube.classList.add('tube-rattling');
+          $('stickResultCard').classList.add('hidden');
+          $('stickConfirmBox').classList.add('hidden');
+          $('poppedStick').classList.add('hidden');
+          $('stickStageHint').textContent = charged ? '✨ 灵力灌注摇签中...' : '🎋 哗啦啦摇签中...';
+
+          setTimeout(() => {
+            tube.classList.remove('tube-rattling');
+            const picked = STICK_DECK[Math.floor(Math.random() * STICK_DECK.length)];
+            pendingStick = picked;
+            stickConfirmFails = 0;
+
+            $('poppedStickNum').textContent = picked.no.replace(/\s+/g, '');
+            $('poppedStick').classList.remove('hidden');
+            $('stickStageHint').textContent = `掉出了【${picked.no}】，请掷圣杯确认！`;
+            $('stickConfirmTitle').textContent = `已摇出 ${picked.no}（${picked.jiazi} · ${picked.allusion}）`;
+            $('stickConfirmStatus').textContent = '待掷圣杯确认';
+            $('stickConfirmStatus').className = 'text-[11px] font-mono-tech text-cyan-300';
+            $('btnForceUnlockStick').classList.add('hidden');
+            $('stickConfirmBox').classList.remove('hidden');
+            SoundFX.playCoin();
+          }, 520);
+        }
+      });
+
+      $('btnConfirmStick').addEventListener('click', () => {
+        if (!pendingStick) return;
+        SoundFX.playBwei();
+        SoundFX.vibrate(25);
+        const leftY = Math.random() >= 0.5;
+        const rightY = Math.random() >= 0.5;
+        if (leftY !== rightY) {
+          // 圣杯！
+          $('stickConfirmStatus').textContent = '✅ 圣杯允准！';
+          $('stickConfirmStatus').className = 'text-[11px] font-mono-tech text-emerald-400 font-bold';
+          SoundFX.playReveal();
+          SoundFX.vibrate([25, 35, 50]);
+          const q = $('stickQuestion').value.trim();
+          renderStickCard(pendingStick, q, false);
+        } else {
+          stickConfirmFails++;
+          const isXiao = leftY && rightY;
+          $('stickConfirmStatus').textContent = isXiao ? '😄 笑杯 · 请再掷或重摇' : '🛑 阴杯 · 神明摇头';
+          $('stickConfirmStatus').className = 'text-[11px] font-mono-tech text-rose-400';
+          showToast(isXiao ? '😄 掷出笑杯！可以再掷一次圣杯或重摇签筒' : '🛑 掷出阴杯！神明觉得这支签不太对路，再试一次');
+          if (stickConfirmFails >= 1) {
+            $('btnForceUnlockStick').classList.remove('hidden');
+          }
+        }
+      });
+
+      $('btnForceUnlockStick').addEventListener('click', () => {
+        if (!pendingStick) return;
+        SoundFX.playReveal();
+        renderStickCard(pendingStick, $('stickQuestion').value.trim(), false);
+        showToast('⚡ 已启用赛博豁免权，强行开签！');
+      });
+
+      $('btnResetStick').addEventListener('click', () => {
+        pendingStick = null;
+        $('stickResultCard').classList.add('hidden');
+        $('stickConfirmBox').classList.add('hidden');
+        $('poppedStick').classList.add('hidden');
+        $('stickStageHint').textContent = '点击或长按右侧按钮摇动签筒';
+        SoundFX.playTick();
+      });
+
+      $('btnPlayOwnStick').addEventListener('click', () => {
+        $('sharedStickBanner').classList.add('hidden');
+        $('btnResetStick').click();
+      });
+
+      $('btnShareStick').addEventListener('click', () => {
+        if (!state.lastStickData) return;
+        const url = buildShareUrl('k', state.lastStickData);
+        copyTextSafe(url, '🔗 灵签分享链接已复制！发给朋友一起看典故');
+      });
+
+      $('btnCopyStick').addEventListener('click', () => {
+        if (!lastStickText) return;
+        copyTextSafe(lastStickText, '📋 灵签诗文已复制，快发群里整活！');
+      });
 
       // Decide / Bwei Divination
       let tripleStreak = 0;

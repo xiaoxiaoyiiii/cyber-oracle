@@ -269,13 +269,13 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             <div>
               <label for="inputBirthDate" class="block text-xs text-slate-400 mb-1.5">公历生辰（年月日）</label>
-              <input id="inputBirthDate" type="date" value="2008-08-08" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm font-mono-tech" />
+              <input id="inputBirthDate" type="date" value="2008-08-08" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-3 py-2.5 rounded-xl text-sm font-mono-tech" />
             </div>
             <div>
-              <label for="inputBirthHour" class="block text-xs text-slate-400 mb-1.5">出生时辰（十二地支）</label>
+              <label for="inputBirthHour" class="block text-xs text-slate-400 mb-1.5">出生时辰（北京时间）</label>
               <select id="inputBirthHour" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm cursor-pointer">
                 <option value="0">子时 (23:00 - 01:00)</option>
                 <option value="1">丑时 (01:00 - 03:00)</option>
@@ -289,6 +289,27 @@
                 <option value="9">酉时 (17:00 - 19:00)</option>
                 <option value="10">戌时 (19:00 - 21:00)</option>
                 <option value="11">亥时 (21:00 - 23:00)</option>
+              </select>
+            </div>
+            <div>
+              <label for="inputBirthCity" class="block text-xs text-slate-400 mb-1.5">出生地区（真太阳时校正）</label>
+              <select id="inputBirthCity" class="oracle-input w-full px-3 py-2.5 rounded-xl text-sm cursor-pointer">
+                <option value="std">东八区标准 (120.0°E)</option>
+                <option value="nanjing" selected>南京 · 华东 (118.8°E)</option>
+                <option value="beijing">北京 · 华北 (116.4°E)</option>
+                <option value="shanghai">上海 · 华东 (121.5°E)</option>
+                <option value="hangzhou">杭州 · 华东 (120.2°E)</option>
+                <option value="guangzhou">广州 · 华南 (113.3°E)</option>
+                <option value="shenzhen">深圳 · 华南 (114.1°E)</option>
+                <option value="wuhan">武汉 · 华中 (114.3°E)</option>
+                <option value="chengdu">成都 · 西南 (104.1°E)</option>
+                <option value="chongqing">重庆 · 西南 (106.5°E)</option>
+                <option value="xian">西安 · 西北 (108.9°E)</option>
+                <option value="harbin">哈尔滨 · 东北 (126.6°E)</option>
+                <option value="shenyang">沈阳 · 东北 (123.4°E)</option>
+                <option value="urumqi">乌鲁木齐 · 新疆 (87.6°E)</option>
+                <option value="lhasa">拉萨 · 西藏 (91.1°E)</option>
+                <option value="tokyo">东京 · 海外 (139.7°E)</option>
               </select>
             </div>
           </div>
@@ -569,15 +590,71 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="p-4 rounded-xl bg-black/35 border border-white/10 space-y-3">
+          <div class="p-4 rounded-xl bg-black/35 border border-white/10 space-y-2.5">
             <div class="text-xs font-bold text-amber-300">👤 甲方缘主</div>
             <input id="matchNameA" type="text" maxlength="14" placeholder="姓名/昵称（如：小弈）" class="oracle-input w-full px-3 py-2 rounded-lg text-sm" />
-            <input id="matchDateA" type="date" value="2008-08-08" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-3 py-2 rounded-lg text-sm font-mono-tech" />
+            <div class="grid grid-cols-2 gap-2">
+              <input id="matchDateA" type="date" value="2008-08-08" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-2.5 py-2 rounded-lg text-xs font-mono-tech" />
+              <select id="matchHourA" class="oracle-input w-full px-2 py-2 rounded-lg text-xs cursor-pointer">
+                <option value="0">子时 (23-01)</option><option value="1">丑时 (01-03)</option>
+                <option value="2">寅时 (03-05)</option><option value="3">卯时 (05-07)</option>
+                <option value="4">辰时 (07-09)</option><option value="5">巳时 (09-11)</option>
+                <option value="6" selected>午时 (11-13)</option><option value="7">未时 (13-15)</option>
+                <option value="8">申时 (15-17)</option><option value="9">酉时 (17-19)</option>
+                <option value="10">戌时 (19-21)</option><option value="11">亥时 (21-23)</option>
+              </select>
+            </div>
+            <select id="matchCityA" class="oracle-input w-full px-2.5 py-2 rounded-lg text-xs cursor-pointer">
+              <option value="std">地区：东八区标准 (120.0°E)</option>
+              <option value="nanjing" selected>地区：南京 · 华东 (118.8°E)</option>
+              <option value="beijing">地区：北京 · 华北 (116.4°E)</option>
+              <option value="shanghai">地区：上海 · 华东 (121.5°E)</option>
+              <option value="hangzhou">地区：杭州 · 华东 (120.2°E)</option>
+              <option value="guangzhou">地区：广州 · 华南 (113.3°E)</option>
+              <option value="shenzhen">地区：深圳 · 华南 (114.1°E)</option>
+              <option value="wuhan">地区：武汉 · 华中 (114.3°E)</option>
+              <option value="chengdu">地区：成都 · 西南 (104.1°E)</option>
+              <option value="chongqing">地区：重庆 · 西南 (106.5°E)</option>
+              <option value="xian">地区：西安 · 西北 (108.9°E)</option>
+              <option value="harbin">地区：哈尔滨 · 东北 (126.6°E)</option>
+              <option value="shenyang">地区：沈阳 · 东北 (123.4°E)</option>
+              <option value="urumqi">地区：乌鲁木齐 · 新疆 (87.6°E)</option>
+              <option value="lhasa">地区：拉萨 · 西藏 (91.1°E)</option>
+              <option value="tokyo">地区：东京 · 海外 (139.7°E)</option>
+            </select>
           </div>
-          <div class="p-4 rounded-xl bg-black/35 border border-white/10 space-y-3">
+          <div class="p-4 rounded-xl bg-black/35 border border-white/10 space-y-2.5">
             <div class="text-xs font-bold text-cyan-300">👤 乙方缘主</div>
             <input id="matchNameB" type="text" maxlength="14" placeholder="姓名/昵称（如：老王）" class="oracle-input w-full px-3 py-2 rounded-lg text-sm" />
-            <input id="matchDateB" type="date" value="2007-11-11" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-3 py-2 rounded-lg text-sm font-mono-tech" />
+            <div class="grid grid-cols-2 gap-2">
+              <input id="matchDateB" type="date" value="2007-11-11" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-2.5 py-2 rounded-lg text-xs font-mono-tech" />
+              <select id="matchHourB" class="oracle-input w-full px-2 py-2 rounded-lg text-xs cursor-pointer">
+                <option value="0">子时 (23-01)</option><option value="1">丑时 (01-03)</option>
+                <option value="2">寅时 (03-05)</option><option value="3">卯时 (05-07)</option>
+                <option value="4">辰时 (07-09)</option><option value="5">巳时 (09-11)</option>
+                <option value="6" selected>午时 (11-13)</option><option value="7">未时 (13-15)</option>
+                <option value="8">申时 (15-17)</option><option value="9">酉时 (17-19)</option>
+                <option value="10">戌时 (19-21)</option><option value="11">亥时 (21-23)</option>
+              </select>
+            </div>
+            <select id="matchCityB" class="oracle-input w-full px-2.5 py-2 rounded-lg text-xs cursor-pointer">
+              <option value="std">地区：东八区标准 (120.0°E)</option>
+              <option value="nanjing">地区：南京 · 华东 (118.8°E)</option>
+              <option value="beijing">地区：北京 · 华北 (116.4°E)</option>
+              <option value="shanghai" selected>地区：上海 · 华东 (121.5°E)</option>
+              <option value="hangzhou">地区：杭州 · 华东 (120.2°E)</option>
+              <option value="guangzhou">地区：广州 · 华南 (113.3°E)</option>
+              <option value="shenzhen">地区：深圳 · 华南 (114.1°E)</option>
+              <option value="wuhan">地区：武汉 · 华中 (114.3°E)</option>
+              <option value="chengdu">地区：成都 · 西南 (104.1°E)</option>
+              <option value="chongqing">地区：重庆 · 西南 (106.5°E)</option>
+              <option value="xian">地区：西安 · 西北 (108.9°E)</option>
+              <option value="harbin">地区：哈尔滨 · 东北 (126.6°E)</option>
+              <option value="shenyang">地区：沈阳 · 东北 (123.4°E)</option>
+              <option value="urumqi">地区：乌鲁木齐 · 新疆 (87.6°E)</option>
+              <option value="lhasa">地区：拉萨 · 西藏 (91.1°E)</option>
+              <option value="tokyo">地区：东京 · 海外 (139.7°E)</option>
+            </select>
           </div>
         </div>
 
@@ -615,6 +692,10 @@
         </div>
 
         <div id="matchPillarsRow" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"></div>
+
+        <!-- 3-Dimension Professional Bazi Synergy -->
+        <div id="matchDimsBox" class="p-3.5 rounded-xl bg-black/30 border border-white/10 space-y-2.5"></div>
+        <div id="matchTagsRow" class="flex flex-wrap gap-1.5"></div>
 
         <div class="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2">
           <div class="text-xs font-serif-cn text-amber-400">【玄机子合盘批注】</div>
@@ -994,11 +1075,32 @@
     // =========================================================================
     // 4. Bazi & Hexagram Algorithms
     // =========================================================================
-    function computeBazi(dateStr, hourIdx) {
+    const CITIES = {
+      std:       { name: '东八区标准', lon: 120.0, region: '中原', el: '土' },
+      nanjing:   { name: '南京', lon: 118.8, region: '华东', el: '木' },
+      beijing:   { name: '北京', lon: 116.4, region: '华北', el: '水' },
+      shanghai:  { name: '上海', lon: 121.5, region: '华东', el: '水' },
+      hangzhou:  { name: '杭州', lon: 120.2, region: '华东', el: '木' },
+      guangzhou: { name: '广州', lon: 113.3, region: '华南', el: '火' },
+      shenzhen:  { name: '深圳', lon: 114.1, region: '华南', el: '火' },
+      wuhan:     { name: '武汉', lon: 114.3, region: '华中', el: '水' },
+      chengdu:   { name: '成都', lon: 104.1, region: '西南', el: '木' },
+      chongqing: { name: '重庆', lon: 106.5, region: '西南', el: '火' },
+      xian:      { name: '西安', lon: 108.9, region: '西北', el: '土' },
+      harbin:    { name: '哈尔滨', lon: 126.6, region: '东北', el: '水' },
+      shenyang:  { name: '沈阳', lon: 123.4, region: '东北', el: '金' },
+      urumqi:    { name: '乌鲁木齐', lon: 87.6, region: '西北', el: '金' },
+      lhasa:     { name: '拉萨', lon: 91.1, region: '西南', el: '土' },
+      tokyo:     { name: '东京', lon: 139.7, region: '东瀛', el: '水' }
+    };
+
+    function computeBazi(dateStr, hourIdx, cityKey = 'std') {
       const parts = (dateStr || '2008-08-08').split('-').map(Number);
       const y = parts[0] || 2008;
       const m = parts[1] || 8;
       const d = parts[2] || 8;
+      const city = CITIES[cityKey] || CITIES.std;
+      const solarOffsetMin = Math.round((city.lon - 120.0) * 4);
 
       // Year Pillar (approx solar year; 1984 is 甲子)
       const yOffset = ((y - 1984) % 60 + 60) % 60;
@@ -1020,8 +1122,12 @@
       const dStemIdx = dOffset % 10;
       const dBranchIdx = dOffset % 12;
 
-      // Hour Pillar (Five Rats formula: 甲己还加甲)
-      const hBranchIdx = Number(hourIdx) % 12;
+      // Hour Pillar with True Solar Time correction (mid-hour of selected 2h slot + longitude offset)
+      const rawHourIdx = Number(hourIdx) % 12;
+      const midHourMin = (rawHourIdx * 2) * 60; // 子时=0:00, 丑时=2:00, ... 午时=12:00
+      const correctedMin = ((midHourMin + solarOffsetMin) % 1440 + 1440) % 1440;
+      const hBranchIdx = Math.floor(((correctedMin + 60) % 1440) / 120);
+      const solarShifted = hBranchIdx !== rawHourIdx;
       const hStemStart = [0, 2, 4, 6, 8][dStemIdx % 5];
       const hStemIdx = (hStemStart + hBranchIdx) % 10;
 
@@ -1043,7 +1149,7 @@
       const nayin = NAYIN_LIST[Math.floor(yOffset / 2) % 30];
       const zodiac = ZODIAC[yBranchIdx];
 
-      return { pillars, counts, dayMasterEl, nayin, zodiac, seed: Math.abs(diffDays) + hBranchIdx * 17 };
+      return { pillars, counts, dayMasterEl, nayin, zodiac, city, solarOffsetMin, solarShifted, seed: Math.abs(diffDays) + hBranchIdx * 17 };
     }
 
     function buildHexagram(yaos) {
@@ -1199,10 +1305,11 @@
       const gender = $('inputGender').value;
       const birthDate = $('inputBirthDate').value || '2008-08-08';
       const birthHour = $('inputBirthHour').value;
+      const birthCity = $('inputBirthCity').value || 'nanjing';
       const mood = $('inputMood').value;
       const question = $('inputQuestion').value.trim();
 
-      const bazi = computeBazi(birthDate, birthHour);
+      const bazi = computeBazi(birthDate, birthHour, birthCity);
       const hex = buildHexagram([...state.castYaos]);
 
       // Pick weakest & strongest elements
@@ -1262,7 +1369,9 @@
       $('resZodiacBadge').textContent = `生肖属${rec.bazi.zodiac} · ${rec.gender}`;
       $('resUserName').textContent = rec.name;
       $('resCyberTitle').textContent = rec.cyberTitle;
-      $('resQuestionEcho').textContent = rec.question ? `心中所念：「${rec.question}」` : `推演时间：${rec.timestamp} · 已完成量子八字校对`;
+      const solarSign = rec.bazi.solarOffsetMin >= 0 ? `+${rec.bazi.solarOffsetMin}` : `${rec.bazi.solarOffsetMin}`;
+      const solarNote = `${rec.bazi.city.name} (${rec.bazi.city.lon}°E, 真太阳时 ${solarSign}分${rec.bazi.solarShifted ? ' · 已跨时辰校准' : ''})`;
+      $('resQuestionEcho').textContent = rec.question ? `心中所念：「${rec.question}」 · ${solarNote}` : `${solarNote}`;
       $('stampTier').textContent = rec.hex.tier;
       $('resMainVerdict').textContent = rec.mainVerdict;
       $('resNayin').textContent = `${rec.bazi.nayin}命 · 日主属${rec.bazi.dayMasterEl}`;
@@ -1395,8 +1504,8 @@
       $('ritualLogs').innerHTML = '';
 
       const lines = [
-        `[0x01] 读取缘主生辰：${record.birthDate} (${record.bazi.zodiac}年 · ${record.bazi.nayin})`,
-        `[0x02] 排布四柱八字：${record.bazi.pillars.map(p => p.stem + p.branch).join(' ')}`,
+        `[0x01] 读取生辰与经度：${record.birthDate} · ${record.bazi.city.name} (${record.bazi.city.lon}°E)`,
+        `[0x02] 真太阳时排盘：${record.bazi.pillars.map(p => p.stem + p.branch).join(' ')}${record.bazi.solarShifted ? ' [时辰已校准]' : ''}`, 
         `[0x03] 校验五行能量：日主属${record.bazi.dayMasterEl}，喜用神为${record.weakestEl}...`,
         `[0x04] 六爻成象完毕：得【${record.hex.name}】 · ${record.hex.tier}`
       ];
@@ -1474,56 +1583,169 @@
       $('meritCount').textContent = '+' + meritTotal;
     }
 
+    const STEM_WUHE = {
+      '甲己': '中正之合（化土）', '己甲': '中正之合（化土）',
+      '乙庚': '仁义之合（化金）', '庚乙': '仁义之合（化金）',
+      '丙辛': '威制之合（化水）', '辛丙': '威制之合（化水）',
+      '丁壬': '淫慝之合（化木）', '壬丁': '淫慝之合（化木）',
+      '戊癸': '无情之合（化火）', '癸戊': '无情之合（化火）'
+    };
+    const STEM_CHONG = new Set(['甲庚','庚甲','乙辛','辛乙','丙壬','壬丙','丁癸','癸丁']);
+    const BRANCH_LIUHE = new Set(['子丑','丑子','寅亥','亥寅','卯戌','戌卯','辰酉','酉辰','巳申','申巳','午未','未午']);
+    const BRANCH_CHONG = new Set(['子午','午子','丑未','未丑','寅申','申寅','卯酉','酉卯','辰戌','戌辰','巳亥','亥巳']);
+    const BRANCH_HAI = new Set(['子未','未子','丑午','午丑','寅巳','巳寅','卯辰','辰卯','申亥','亥申','酉戌','戌酉']);
+    const SANHE_GROUPS = [['申','子','辰'],['亥','卯','未'],['寅','午','戌'],['巳','酉','丑']];
+
+    function renderMatchBreakdown(dims, tags) {
+      $('matchDimsBox').innerHTML = dims.map(d => `
+        <div class="flex items-center gap-2.5 text-xs">
+          <span class="w-24 text-slate-300 shrink-0">${d.label}</span>
+          <div class="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+            <div class="h-full ${d.color} rounded-full transition-all duration-700" style="width: ${d.val}%"></div>
+          </div>
+          <span class="w-10 text-right font-mono-tech text-amber-200">${d.val}%</span>
+        </div>
+      `).join('');
+
+      $('matchTagsRow').innerHTML = tags.map(t => `
+        <span class="text-[11px] px-2.5 py-0.5 rounded-full border ${t.good ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30' : 'bg-rose-500/15 text-rose-300 border-rose-400/30'}">${t.text}</span>
+      `).join('');
+    }
+
     let lastMatchText = '';
     function runDuoMatch() {
       const nameA = $('matchNameA').value.trim() || '甲方道友';
       const nameB = $('matchNameB').value.trim() || '乙方道友';
       const dateA = $('matchDateA').value || '2008-08-08';
       const dateB = $('matchDateB').value || '2007-11-11';
+      const hourA = $('matchHourA').value || '6';
+      const hourB = $('matchHourB').value || '6';
+      const cityA = $('matchCityA').value || 'nanjing';
+      const cityB = $('matchCityB').value || 'shanghai';
       const rel = $('matchRelation').value;
 
-      const bA = computeBazi(dateA, 6);
-      const bB = computeBazi(dateB, 6);
+      const bA = computeBazi(dateA, hourA, cityA);
+      const bB = computeBazi(dateB, hourB, cityB);
 
-      // Five elements generating & controlling pairs
       const genMap = { '木': '火', '火': '土', '土': '金', '金': '水', '水': '木' };
       const ctrlMap = { '木': '土', '土': '水', '水': '火', '火': '金', '金': '木' };
 
-      const elA = bA.dayMasterEl;
-      const elB = bB.dayMasterEl;
-      let baseScore = 72 + ((bA.seed + bB.seed) % 21);
-      let relationTag = '五行平和 · 默契搭子';
-      if (genMap[elA] === elB || genMap[elB] === elA) {
-        baseScore = Math.min(99, baseScore + 12);
-        relationTag = `${elA}${elB}相生 · 天作之合`;
-      } else if (elA === elB) {
-        baseScore = Math.min(95, baseScore + 6);
-        relationTag = `双${elA}比劫 · 臭味相投`;
+      const dayStemA = bA.pillars[2].stem, dayStemB = bB.pillars[2].stem;
+      const dayBranchA = bA.pillars[2].branch, dayBranchB = bB.pillars[2].branch;
+      const yearBranchA = bA.pillars[0].branch, yearBranchB = bB.pillars[0].branch;
+      const elA = bA.dayMasterEl, elB = bB.dayMasterEl;
+
+      const tags = [];
+
+      // 1. 天干情缘（日主）
+      let stemScore = 72;
+      const stemPair = dayStemA + dayStemB;
+      if (STEM_WUHE[stemPair]) {
+        stemScore = 96;
+        tags.push({ good: true, text: `日干${dayStemA}${dayStemB} · ${STEM_WUHE[stemPair]}` });
+      } else if (genMap[elA] === elB || genMap[elB] === elA) {
+        stemScore = 88;
+        tags.push({ good: true, text: `日主${elA}${elB}相生（天然投缘）` });
+      } else if (dayStemA === dayStemB) {
+        stemScore = 83;
+        tags.push({ good: true, text: `双${dayStemA}比肩（想法高度同频）` });
+      } else if (STEM_CHONG.has(stemPair)) {
+        stemScore = 62;
+        tags.push({ good: false, text: `日干${dayStemA}${dayStemB}相冲（容易嘴硬互杠）` });
       } else if (ctrlMap[elA] === elB || ctrlMap[elB] === elA) {
-        baseScore = Math.max(58, baseScore - 8);
-        relationTag = `${elA}${elB}相克 · 相爱相杀`;
+        stemScore = 68;
+        tags.push({ good: false, text: `日主${elA}${elB}相克（互相拿捏）` });
       }
+
+      // 2. 地支宫位（日支夫妻/关系宫 + 年支生肖宫）
+      let branchScore = 74;
+      const dayBranchPair = dayBranchA + dayBranchB;
+      const yearBranchPair = yearBranchA + yearBranchB;
+
+      if (BRANCH_LIUHE.has(dayBranchPair)) {
+        branchScore += 18;
+        tags.push({ good: true, text: `日支${dayBranchA}${dayBranchB}六合（相处极舒服）` });
+      } else if (BRANCH_CHONG.has(dayBranchPair)) {
+        branchScore -= 14;
+        tags.push({ good: false, text: `日支${dayBranchA}${dayBranchB}相冲（作息习惯易碰撞）` });
+      } else if (BRANCH_HAI.has(dayBranchPair)) {
+        branchScore -= 8;
+        tags.push({ good: false, text: `日支${dayBranchA}${dayBranchB}相害（小事别较真）` });
+      }
+
+      if (BRANCH_LIUHE.has(yearBranchPair)) {
+        branchScore += 8;
+        tags.push({ good: true, text: `生肖${bA.zodiac}${bB.zodiac}六合` });
+      } else if (SANHE_GROUPS.some(g => g.includes(yearBranchA) && g.includes(yearBranchB) && yearBranchA !== yearBranchB)) {
+        branchScore += 10;
+        tags.push({ good: true, text: `生肖${bA.zodiac}${bB.zodiac}三合贵人` });
+      } else if (BRANCH_CHONG.has(yearBranchPair)) {
+        branchScore -= 6;
+        tags.push({ good: false, text: `生肖${bA.zodiac}${bB.zodiac}六冲（欢喜冤家）` });
+      }
+      branchScore = Math.max(45, Math.min(99, branchScore));
+
+      // 3. 五行互补度（看双方八字最弱五行是否被对方强项补齐）
+      const weakA = Object.entries(bA.counts).sort((a, b) => a[1] - b[1])[0][0];
+      const strongA = Object.entries(bA.counts).sort((a, b) => b[1] - a[1])[0][0];
+      const weakB = Object.entries(bB.counts).sort((a, b) => a[1] - b[1])[0][0];
+      const strongB = Object.entries(bB.counts).sort((a, b) => b[1] - a[1])[0][0];
+
+      let elemScore = 68;
+      if (strongB === weakA) { elemScore += 15; tags.push({ good: true, text: `${nameB}旺${strongB}补${nameA}之缺` }); }
+      if (strongA === weakB) { elemScore += 15; tags.push({ good: true, text: `${nameA}旺${strongA}补${nameB}之缺` }); }
+      if (weakA === weakB) { elemScore -= 5; tags.push({ good: false, text: `两人同缺${weakA}（需一起补${weakA}）` }); }
+      elemScore = Math.max(50, Math.min(99, elemScore));
+
+      // 地域水土调候
+      if (bA.city.region === bB.city.region) {
+        tags.push({ good: true, text: `同属${bA.city.region}水土 · 生活习惯零代沟` });
+      } else if (genMap[bA.city.el] === bB.city.el || genMap[bB.city.el] === bA.city.el) {
+        elemScore = Math.min(99, elemScore + 6);
+        tags.push({ good: true, text: `${bA.city.name}×${bB.city.name} · 异地水土调候相生` });
+      } else {
+        tags.push({ good: true, text: `${bA.city.region}遇上${bB.city.region} · 跨区新鲜感强` });
+      }
+
+      if (tags.length === 0) {
+        tags.push({ good: true, text: '八字平和无大冲 · 细水长流型' });
+      }
+
+      const baseScore = Math.round(stemScore * 0.4 + branchScore * 0.35 + elemScore * 0.25);
+
+      let relationTag = '五行平和 · 默契搭子';
+      if (baseScore >= 90) relationTag = '天干地支双合 · 天选宿命';
+      else if (baseScore >= 82) relationTag = `${elA}${elB}相济 · 黄金拍档`;
+      else if (baseScore >= 72) relationTag = '和而不同 · 越处越顺';
+      else relationTag = '相爱相杀 · 欢喜冤家';
+
+      const dims = [
+        { label: '天干共鸣度', val: stemScore, color: 'bg-amber-400' },
+        { label: '地支宫位合', val: branchScore, color: 'bg-cyan-400' },
+        { label: '五行互补度', val: elemScore, color: 'bg-emerald-400' }
+      ];
+
+      const proSummary = `从四柱来看，${nameA}日柱为「${dayStemA}${dayBranchA}」（${elA}命），${nameB}日柱为「${dayStemB}${dayBranchB}」（${elB}命）。` +
+        (strongB === weakA || strongA === weakB
+          ? `你们在五行能量上形成了罕见的「双向补给」——一方缺的正是另一方溢出的，待在一起会莫名觉得踏实！`
+          : `两人气场节奏各有主见，相处时既能互相激发新想法，又各自保留独立空间。`);
 
       const relPools = {
         '开黑搭档': [
-          `你们一个主${elA}一个主${elB}，打团时一个负责冲锋背锅，一个负责冷静收割。只要不抢同一个位置，上分如喝水！`,
-          `双人排位气场极稳！哪怕前期逆风被推到高地，你们俩总能靠一波离谱配合翻盘，属于越逆境越猛的组合。`,
-          `命盘显示你们语音沟通时废话极多但莫名默契，建议今晚直接约两把，赢了吹牛、输了互相甩锅，快乐拉满！`
+          `${proSummary} 放到排位里就是一个人冲锋开团、一个人冷静收割，只要不抢同一个位置，上分稳得一批！`,
+          `${proSummary} 逆风局抗压能力极强，语音里哪怕互相甩锅也越打越默契，今晚必须约两把！`
         ],
         '损友互坑': [
-          `命盘显示你们聚在一起智商会自动减半、快乐直接翻倍。互相发抽象表情包的频率极高，建议锁死别去祸害别人。`,
-          `一个主${elA}、一个主${elB}，日常对话 90% 都是互相拆台，但真遇到事儿时对方绝对是第一个顶上来的靠谱损友。`,
-          `天机显示你们属于「绝佳饭搭子 + 吐槽机」配置，周末哪怕只是压马路瞎逛都能聊出三个小时的段子。`
+          `${proSummary} 命盘显示你们聚在一起智商自动减半、快乐直接翻倍，属于互相拆台但关键时刻绝不掉链子的铁杆损友！`,
+          `${proSummary} 绝佳饭搭子 + 吐槽机配置，随便压个马路都能聊出三小时的抽象段子。`
         ],
         '暧昧心动': [
-          `气场磁场有明显共振！${elA}与${elB}交汇容易擦出奇妙火花，今天谁先主动发一句「在干嘛」，谁就掌握主动权。`,
-          `红鸾星在你们俩之间疯狂闪烁！聊天时别太端着，偶尔抛个小梗或分享日常碎片，好感度会蹭蹭往上涨。`,
-          `五行互补度极高，属于「相处不累、越聊越上头」的类型。找个机会约顿饭或一起散个步，氛围感直接到位！`
+          `${proSummary} 感情宫已有明显共振信号！聊天别太端着，分享一点日常碎片或幽默小梗，好感度会蹭蹭涨！`,
+          `${proSummary} 属于「相处不累、越聊越上头」的类型，最近找个机会约顿饭或散散步，氛围感直接拉满。`
         ],
         '创业合伙': [
-          `一个擅长天马行空搞创意，一个擅长稳扎稳打兜底线。只要分工明确、账目清晰，一起折腾点小项目大概率能成！`,
-          `事业宫呈相辅相成之势：${nameA}负责破局开路，${nameB}擅长收口落地。别光停在群里画饼，今天就可以把第一步跑起来！`,
-          `你们俩的思维盲区刚好错开，讨论方案时容易吵出火花，但吵完做出来的成品往往比单干强出一大截。`
+          `${proSummary} 一个擅长天马行空破局，一个擅长稳扎稳打收口。只要分工明确、账目清晰，一起折腾项目大概率能成！`,
+          `${proSummary} 你们的思维盲区刚好错开，讨论方案容易吵出火花，但吵完落地的成品往往比单干强出一大截。`
         ]
       };
       const pool = relPools[rel] || relPools['损友互坑'];
@@ -1536,21 +1758,29 @@
 
       $('matchPillarsRow').innerHTML = `
         <div class="p-3 rounded-xl bg-black/35 border border-white/10">
-          <div class="text-amber-300 font-bold mb-1">${nameA} · 属${bA.zodiac}</div>
-          <div class="text-slate-300">日主：<span class="text-amber-200 font-semibold">${elA}</span> · ${bA.nayin}命</div>
+          <div class="text-amber-300 font-bold mb-1">${nameA} · ${bA.city.name} (${bA.city.lon}°E) · 属${bA.zodiac}</div>
+          <div class="text-slate-300 font-mono-tech">${bA.pillars.map(p => p.stem + p.branch).join(' ')} <span class="text-[10px] text-slate-400">(${bA.nayin})</span></div>
         </div>
         <div class="p-3 rounded-xl bg-black/35 border border-white/10">
-          <div class="text-cyan-300 font-bold mb-1">${nameB} · 属${bB.zodiac}</div>
-          <div class="text-slate-300">日主：<span class="text-cyan-200 font-semibold">${elB}</span> · ${bB.nayin}命</div>
+          <div class="text-cyan-300 font-bold mb-1">${nameB} · ${bB.city.name} (${bB.city.lon}°E) · 属${bB.zodiac}</div>
+          <div class="text-slate-300 font-mono-tech">${bB.pillars.map(p => p.stem + p.branch).join(' ')} <span class="text-[10px] text-slate-400">(${bB.nayin})</span></div>
         </div>
       `;
 
+      renderMatchBreakdown(dims, tags);
       $('matchVerdict').textContent = pickedDuoComment;
       $('matchResultCard').classList.remove('hidden');
       SoundFX.playReveal();
 
-      state.lastMatchData = { a: nameA, da: dateA, b: nameB, db: dateB, r: rel, sc: baseScore, tag: relationTag, v: pickedDuoComment, elA, elB, zA: bA.zodiac, zB: bB.zodiac, nA: bA.nayin, nB: bB.nayin };
-      lastMatchText = `【天机终端 · 双人合盘】\n${nameA}（${elA}） × ${nameB}（${elB}）\n关系：${rel} | 契合度：${baseScore}%\n称号：${relationTag}\n批注：${pickedDuoComment}`;
+      state.lastMatchData = {
+        a: nameA, da: dateA, ha: hourA, b: nameB, db: dateB, hb: hourB,
+        r: rel, sc: baseScore, tag: relationTag, v: pickedDuoComment,
+        pA: bA.pillars.map(p => p.stem + p.branch).join(' '),
+        pB: bB.pillars.map(p => p.stem + p.branch).join(' '),
+        zA: bA.zodiac, zB: bB.zodiac, nA: bA.nayin, nB: bB.nayin,
+        dims, tags
+      };
+      lastMatchText = `【天机终端 · 专业八字合盘】\n${nameA}（${bA.pillars.map(p => p.stem + p.branch).join(' ')}） × ${nameB}（${bB.pillars.map(p => p.stem + p.branch).join(' ')}）\n关系：${rel} | 契合度：${baseScore}%\n称号：${relationTag}\n批注：${pickedDuoComment}`;
     }
 
     function encodeSharePayload(obj) {
@@ -1773,17 +2003,20 @@
           $('tabMatch').click();
           $('matchNameA').value = p.a;
           $('matchDateA').value = p.da;
+          if (p.ha) $('matchHourA').value = p.ha;
           $('matchNameB').value = p.b;
           $('matchDateB').value = p.db;
+          if (p.hb) $('matchHourB').value = p.hb;
           $('matchRelation').value = p.r;
           $('matchPairNames').textContent = `${p.a} × ${p.b}`;
           $('matchDuoTitle').textContent = `${p.tag}（${p.r}）`;
           $('matchScoreText').textContent = `${p.sc}%`;
           $('matchScoreBar').style.width = `${p.sc}%`;
           $('matchPillarsRow').innerHTML = `
-            <div class="p-3 rounded-xl bg-black/35 border border-white/10"><div class="text-amber-300 font-bold mb-1">${p.a} · 属${p.zA}</div><div class="text-slate-300">日主：<span class="text-amber-200 font-semibold">${p.elA}</span> · ${p.nA}命</div></div>
-            <div class="p-3 rounded-xl bg-black/35 border border-white/10"><div class="text-cyan-300 font-bold mb-1">${p.b} · 属${p.zB}</div><div class="text-slate-300">日主：<span class="text-cyan-200 font-semibold">${p.elB}</span> · ${p.nB}命</div></div>
+            <div class="p-3 rounded-xl bg-black/35 border border-white/10"><div class="text-amber-300 font-bold mb-1">${p.a} · 属${p.zA}（${p.nA}）</div><div class="text-slate-300 font-mono-tech">${p.pA || ('日主：' + p.elA)}</div></div>
+            <div class="p-3 rounded-xl bg-black/35 border border-white/10"><div class="text-cyan-300 font-bold mb-1">${p.b} · 属${p.zB}（${p.nB}）</div><div class="text-slate-300 font-mono-tech">${p.pB || ('日主：' + p.elB)}</div></div>
           `;
+          if (p.dims && p.tags) renderMatchBreakdown(p.dims, p.tags);
           $('matchVerdict').textContent = p.v;
           $('matchResultCard').classList.remove('hidden');
           $('sharedMatchBanner').classList.remove('hidden');

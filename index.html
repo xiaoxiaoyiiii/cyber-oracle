@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>天机终端 · 赛博算命局</title>
+  <meta name="description" content="赛博周易八字排盘、六爻手摇铜钱、双人合盘与掷圣杯决断，快来测测你的今日天机！" />
+  <meta property="og:title" content="天机终端 · 赛博算命局" />
+  <meta property="og:description" content="报上生辰八字与心中所惑，亲手摇六爻铜钱或掷圣杯，生成你的专属赛博灵符！" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307080d'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%23f5c542' stroke-width='2.5'/%3E%3Cpath d='M32 10 A22 22 0 0 1 32 54 A11 11 0 0 1 32 32 A11 11 0 0 0 32 10 Z' fill='%23f5c542'/%3E%3Ccircle cx='32' cy='21' r='3' fill='%2307080d'/%3E%3Ccircle cx='32' cy='43' r='3' fill='%23f5c542'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;700;900&display=swap');
+
+    :root {
+      --bg-void: #07080d;
+      --bg-card: rgba(15, 18, 28, 0.86);
+      --cinnabar: #ff453a;
+      --gold: #f5c542;
+      --cyan: #22d3ee;
+      --jade: #34d399;
+      --border-glow: rgba(245, 197, 66, 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: var(--bg-void);
+      color: #e5e7eb;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .font-serif-cn {
+      font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+    }
+
+    .font-mono-tech {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Subtle cyber grid background */
+    .cyber-grid {
+      background-image:
+        linear-gradient(to right, rgba(245, 197, 66, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    /* Bagua slow rotation */
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spinReverse {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 8px rgba(245, 197, 66, 0.35)); }
+      50% { opacity: 0.95; filter: drop-shadow(0 0 18px rgba(245, 197, 66, 0.75)); }
+    }
+
+    @keyframes stampSlam {
+      0% { transform: scale(2.2) rotate(-18deg); opacity: 0; }
+      70% { transform: scale(0.92) rotate(-8deg); opacity: 1; }
+      100% { transform: scale(1) rotate(-10deg); opacity: 0.92; }
+    }
+
+    @keyframes coinFlip {
+      0% { transform: rotateY(0deg) translateY(0); }
+      50% { transform: rotateY(540deg) translateY(-18px) scale(1.12); }
+      100% { transform: rotateY(1080deg) translateY(0); }
+    }
+
+    .animate-spin-slow {
+      animation: spinSlow 48s linear infinite;
+    }
+
+    .animate-spin-fast {
+      animation: spinSlow 2.4s linear infinite;
+    }
+
+    .animate-spin-reverse {
+      animation: spinReverse 32s linear infinite;
+    }
+
+    .animate-stamp {
+      animation: stampSlam 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .coin-flipping {
+      animation: coinFlip 0.65s ease-in-out;
+    }
+
+    @keyframes chargeShake {
+      0%, 100% { transform: translate(0, 0) scale(1.04); }
+      25% { transform: translate(-2px, 2px) scale(1.06); }
+      50% { transform: translate(2px, -2px) scale(1.05); }
+      75% { transform: translate(-2px, -1px) scale(1.07); }
+    }
+
+    .charging-shake {
+      animation: chargeShake 0.14s linear infinite;
+      filter: drop-shadow(0 0 14px rgba(245, 197, 66, 0.75));
+    }
+
+    .glass-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .gold-border-glow {
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 0 24px rgba(245, 197, 66, 0.08), inset 0 1px 0 rgba(245, 197, 66, 0.12);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); }
+    ::-webkit-scrollbar-thumb { background: rgba(245, 197, 66, 0.25); border-radius: 999px; }
+
+    /* Input styling */
+    .oracle-input {
+      background: rgba(9, 11, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f3f4f6;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .oracle-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(245, 197, 66, 0.15);
+    }
+    /* Fix date input icon in dark mode */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.85) sepia(0.3) saturate(2) hue-rotate(10deg);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="cyber-grid relative selection:bg-amber-400/30 selection:text-amber-100">
+  <!-- Ambient Background Canvas -->
+  <canvas id="bgParticles" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Subtle Top Radial Glow -->
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[720px] h-[320px] bg-amber-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+  <!-- Main Container -->
+  <div class="relative z-10 max-w-4xl mx-auto px-4 py-6 sm:py-8">
+    <!-- Top Header -->
+    <header class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div class="flex items-center gap-3">
+        <div class="relative w-11 h-11 flex items-center justify-center rounded-xl bg-amber-500/10 border border-amber-400/30">
+          <svg class="w-7 h-7 text-amber-400 animate-spin-slow" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <circle cx="32" cy="32" r="19" stroke="#22d3ee" stroke-width="1.2" opacity="0.7"/>
+            <path d="M32 13 A19 19 0 0 1 32 51 A9.5 9.5 0 0 1 32 32 A9.5 9.5 0 0 0 32 13 Z" fill="currentColor" opacity="0.85"/>
+            <circle cx="32" cy="22.5" r="2.2" fill="#07080d"/>
+            <circle cx="32" cy="41.5" r="2.2" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-serif-cn text-xl sm:text-2xl font-black tracking-wider text-amber-300">天机终端</h1>
+            <span class="font-mono-tech text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-400/30">ORACLE v9.9</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">赛博周易 · 八字排盘 · 六爻金钱卦</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btnHistoryToggle" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition cursor-pointer">
+          <span>📜</span>
+          <span>卦录</span>
+          <span id="historyCount" class="font-mono-tech text-[11px] px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300">0</span>
+        </button>
+        <button id="btnSoundToggle" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-400/25 transition cursor-pointer" title="开关音效">
+          <span id="soundIcon">🔊</span>
+          <span id="soundLabel">清音开</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mode Switcher & Cyber Merit -->
+    <nav class="flex flex-wrap items-center justify-between gap-2.5 mb-5">
+      <div class="inline-flex p-1 rounded-xl bg-white/5 border border-white/10">
+        <button id="tabSingle" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-400 text-slate-950 transition cursor-pointer">
+          ☯ 单人问卦
+        </button>
+        <button id="tabMatch" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer">
+          🤝 双人合盘
+        </button>
+        <button id="tabDecide" type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer">
+          🎲 决断问事
+        </button>
+      </div>
+      <button id="btnMerit" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 border border-amber-400/25 active:scale-95 transition cursor-pointer">
+        <span>🪵</span>
+        <span>敲木鱼攒功德</span>
+        <span id="meritCount" class="font-mono-tech text-amber-300 font-bold">+0</span>
+      </button>
+    </nav>
+
+    <!-- History Drawer (Collapsible) -->
+    <section id="historyDrawer" class="hidden mb-6 glass-panel rounded-2xl p-4 border border-amber-400/20">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-serif-cn text-sm font-bold text-amber-300">往期推演档案（点击可回看）</h2>
+        <button id="btnClearHistory" type="button" class="text-xs text-rose-400 hover:text-rose-300 cursor-pointer">清空档案</button>
+      </div>
+      <div id="historyList" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-56 overflow-y-auto pr-1"></div>
+    </section>
+
+    <!-- VIEW 1: Input & Divination Ritual -->
+    <main id="viewInput" class="space-y-5">
+      <!-- Master Greeting Banner -->
+      <div class="glass-panel gold-border-glow rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-500/20 to-rose-500/20 border border-amber-400/30 flex items-center justify-center text-2xl">
+            ☯️
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-serif-cn font-bold text-amber-200 text-base">玄机子 · 赛博值守中</span>
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+              「缘主请坐。报上生辰八字与心中所惑，再亲手摇三枚铜钱起卦——贫道用量子算力替你校准一下天道参数。」
+            </p>
+          </div>
+        </div>
+        <button id="btnQuickFill" type="button" class="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 transition cursor-pointer">
+          ⚡ 随便填个有缘人试试
+        </button>
+      </div>
+
+      <!-- Form + Coin Ritual Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Left: Bazi & Parameters -->
+        <div class="lg:col-span-7 glass-panel rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <h2 class="font-serif-cn text-base font-bold text-amber-300 flex items-center gap-2">
+              <span>一、录入命理参数</span>
+            </h2>
+            <span class="font-mono-tech text-[11px] text-slate-400">STEP 01 // BAZI</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="inputName" class="block text-xs text-slate-400 mb-1.5">缘主名号 / 昵称</label>
+              <input id="inputName" type="text" maxlength="16" placeholder="例如：小弈（默认有缘人）" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label for="inputGender" class="block text-xs text-slate-400 mb-1.5">阴阳乾坤（命盘属性）</label>
+              <select id="inputGender" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm cursor-pointer">
+                <option value="乾造">乾造（阳 / 偏刚）</option>
+                <option value="坤造">坤造（阴 / 偏柔）</option>
+                <option value="混元">混元（赛博无相）</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="inputBirthDate" class="block text-xs text-slate-400 mb-1.5">公历生辰（年月日）</label>
+              <input id="inputBirthDate" type="date" value="2008-08-08" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm font-mono-tech" />
+            </div>
+            <div>
+              <label for="inputBirthHour" class="block text-xs text-slate-400 mb-1.5">出生时辰（十二地支）</label>
+              <select id="inputBirthHour" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm cursor-pointer">
+                <option value="0">子时 (23:00 - 01:00)</option>
+                <option value="1">丑时 (01:00 - 03:00)</option>
+                <option value="2">寅时 (03:00 - 05:00)</option>
+                <option value="3">卯时 (05:00 - 07:00)</option>
+                <option value="4">辰时 (07:00 - 09:00)</option>
+                <option value="5">巳时 (09:00 - 11:00)</option>
+                <option value="6" selected>午时 (11:00 - 13:00)</option>
+                <option value="7">未时 (13:00 - 15:00)</option>
+                <option value="8">申时 (15:00 - 17:00)</option>
+                <option value="9">酉时 (17:00 - 19:00)</option>
+                <option value="10">戌时 (19:00 - 21:00)</option>
+                <option value="11">亥时 (21:00 - 23:00)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Topic Selection -->
+          <div>
+            <label class="block text-xs text-slate-400 mb-2">所问何事（决定断语侧重）</label>
+            <div id="topicGroup" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" data-topic="运势" class="topic-btn px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer bg-amber-400/15 border-amber-400 text-amber-200">
+                ⚡ 综合运势
+              </button>
+              <button type="button" data-topic="学业事业" class="topic-btn px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer bg-white/5 border-white/10 text-slate-300 hover:bg-white/10">
+                💻 学业/搞钱
+              </button>
+              <button type="button" data-topic="姻缘" class="topic-btn px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer bg-white/5 border-white/10 text-slate-300 hover:bg-white/10">
+                🌸 桃花姻缘
+              </button>
+              <button type="button" data-topic="渡劫" class="topic-btn px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer bg-white/5 border-white/10 text-slate-300 hover:bg-white/10">
+                🌩️ 破局渡劫
+              </button>
+            </div>
+          </div>
+
+          <!-- Optional Focus Question + Element Vibe -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div>
+              <label for="inputMood" class="block text-xs text-slate-400 mb-1.5">此刻心境（灵力校准）</label>
+              <select id="inputMood" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm cursor-pointer">
+                <option value="peace">心如止水 · 顺其自然</option>
+                <option value="fire">斗志昂扬 · 想干票大的</option>
+                <option value="chaos">有点迷茫 · 求指条明路</option>
+                <option value="chill">只想摸鱼 · 别让我加班</option>
+              </select>
+            </div>
+            <div>
+              <label for="inputQuestion" class="block text-xs text-slate-400 mb-1.5">心中默念之事（选填）</label>
+              <input id="inputQuestion" type="text" maxlength="36" placeholder="比如：这周适合表白/开新坑吗？" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Interactive 6-Yao Coin Casting -->
+        <div class="lg:col-span-5 glass-panel rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+              <h2 class="font-serif-cn text-base font-bold text-amber-300">二、手摇铜钱起卦</h2>
+              <span id="castProgressBadge" class="font-mono-tech text-[11px] px-2 py-0.5 rounded bg-amber-400/15 text-amber-300">0 / 6 爻</span>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+              传统六爻需连摇六次铜钱（自下而上成卦）。你可以<span class="text-amber-300">亲自点击摇卦</span>，也可以让赛博灵枢一键代摇。
+            </p>
+
+            <!-- 3 Cyber Coins Visual -->
+            <div class="flex items-center justify-center gap-4 py-4 bg-black/30 rounded-xl border border-white/5 mb-4">
+              <div id="coin0" class="w-14 h-14 rounded-full border-2 border-amber-400/60 bg-gradient-to-br from-amber-500/20 to-amber-900/40 flex items-center justify-center shadow-lg shadow-amber-500/10">
+                <div class="w-4 h-4 border border-amber-300/70 rotate-45 flex items-center justify-center text-[9px] font-serif-cn text-amber-200">乾</div>
+              </div>
+              <div id="coin1" class="w-14 h-14 rounded-full border-2 border-amber-400/60 bg-gradient-to-br from-amber-500/20 to-amber-900/40 flex items-center justify-center shadow-lg shadow-amber-500/10">
+                <div class="w-4 h-4 border border-amber-300/70 rotate-45 flex items-center justify-center text-[9px] font-serif-cn text-amber-200">隆</div>
+              </div>
+              <div id="coin2" class="w-14 h-14 rounded-full border-2 border-amber-400/60 bg-gradient-to-br from-amber-500/20 to-amber-900/40 flex items-center justify-center shadow-lg shadow-amber-500/10">
+                <div class="w-4 h-4 border border-amber-300/70 rotate-45 flex items-center justify-center text-[9px] font-serif-cn text-amber-200">通</div>
+              </div>
+            </div>
+
+            <!-- 6 Yao Lines Preview (bottom to top) -->
+            <div class="bg-black/30 rounded-xl border border-white/5 p-3 mb-4">
+              <div class="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+                <span>当前卦象生成区（初爻→上爻）</span>
+                <button id="btnResetCast" type="button" class="text-slate-400 hover:text-amber-300 cursor-pointer">重摇</button>
+              </div>
+              <div id="yaoPreviewList" class="flex flex-col-reverse gap-1.5 min-h-[108px] justify-center">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-2.5">
+            <div class="grid grid-cols-2 gap-2.5">
+              <button id="btnCastOnce" type="button" class="relative overflow-hidden select-none touch-none px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 border border-amber-400/40 transition cursor-pointer">
+                <span id="castChargeBar" class="absolute inset-y-0 left-0 w-0 bg-gradient-to-r from-amber-400/40 to-cyan-400/40 pointer-events-none transition-none"></span>
+                <span class="relative z-10">🪙 摇一爻（可长按）</span>
+              </button>
+              <button id="btnCastAuto" type="button" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 border border-cyan-400/35 transition cursor-pointer">
+                ⚡ 一键六爻
+              </button>
+            </div>
+
+            <button id="btnStartDivine" type="button" class="w-full py-3.5 rounded-xl font-serif-cn text-base font-bold tracking-wider bg-gradient-to-r from-rose-600 via-amber-500 to-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-[0.99] transition cursor-pointer">
+              ☯ 请天机 · 立即开算
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- VIEW 2: Calculating Ritual Overlay -->
+    <section id="viewRitual" class="hidden glass-panel gold-border-glow rounded-2xl p-6 sm:p-10 text-center space-y-6">
+      <div class="relative w-36 h-36 mx-auto flex items-center justify-center">
+        <svg class="w-36 h-36 text-amber-400 animate-spin-fast" viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <circle cx="60" cy="60" r="44" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="10 5"/>
+          <polygon points="60,12 102,84 18,84" stroke="#ff453a" stroke-width="1.2" opacity="0.7"/>
+          <polygon points="60,108 102,36 18,36" stroke="#f5c542" stroke-width="1.2" opacity="0.7"/>
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center font-serif-cn text-2xl font-black text-amber-300">
+          算
+        </div>
+      </div>
+
+      <div>
+        <h2 class="font-serif-cn text-xl font-bold text-amber-200 mb-2">玄机子正在掐指推演…</h2>
+        <div id="ritualLogs" class="font-mono-tech text-xs text-cyan-300/90 space-y-1.5 max-w-md mx-auto text-left bg-black/50 p-4 rounded-xl border border-white/10 min-h-[104px]">
+        </div>
+      </div>
+
+      <button id="btnSkipRitual" type="button" class="text-xs text-slate-400 hover:text-amber-300 underline underline-offset-4 cursor-pointer">
+        跳过推演仪式，直接看判词
+      </button>
+    </section>
+
+    <!-- VIEW 3: Divination Result -->
+    <section id="viewResult" class="hidden space-y-5">
+      <div id="sharedResultBanner" class="hidden px-4 py-2.5 rounded-xl bg-cyan-500/15 border border-cyan-400/35 text-xs text-cyan-200 flex items-center justify-between gap-2">
+        <span id="sharedResultText">👀 你正在围观好友分享的天机签文</span>
+        <button id="btnPlayOwnSingle" type="button" class="shrink-0 px-3 py-1 rounded-lg bg-amber-400 text-slate-950 font-semibold cursor-pointer">✨ 我也要算一卦</button>
+      </div>
+      <!-- Top Fortune Header Card -->
+      <div class="glass-panel gold-border-glow rounded-2xl p-5 sm:p-6 relative overflow-hidden">
+        <!-- Cinnabar Stamp -->
+        <div id="resultStamp" class="absolute top-4 right-4 sm:top-6 sm:right-6 w-20 h-20 rounded-xl border-2 border-rose-500/80 text-rose-500 flex flex-col items-center justify-center font-serif-cn font-black select-none pointer-events-none animate-stamp bg-rose-500/5">
+          <span id="stampTier" class="text-lg leading-tight">上上签</span>
+          <span class="text-[10px] tracking-widest border-t border-rose-500/50 mt-0.5 pt-0.5">天机认证</span>
+        </div>
+
+        <div class="pr-24">
+          <div class="flex flex-wrap items-center gap-2 text-xs text-cyan-300 font-mono-tech mb-2">
+            <span id="resSerial">#ORACLE-0000</span>
+            <span>·</span>
+            <span id="resTopicBadge">所问：运势</span>
+            <span>·</span>
+            <span id="resZodiacBadge">生肖属鼠</span>
+          </div>
+          <h2 class="font-serif-cn text-2xl sm:text-3xl font-black text-amber-300 tracking-wide">
+            <span id="resUserName">有缘人</span> · <span id="resCyberTitle" class="text-white">玄机码农</span>
+          </h2>
+          <p id="resQuestionEcho" class="text-xs text-slate-400 mt-1.5 italic"></p>
+        </div>
+
+        <!-- Master's Main Verdict -->
+        <div class="mt-5 p-4 rounded-xl bg-black/40 border border-amber-400/20">
+          <div class="text-xs font-serif-cn text-amber-400 mb-1.5">【玄机子 · 铁口直断】</div>
+          <p id="resMainVerdict" class="text-sm sm:text-base text-slate-100 leading-relaxed font-serif-cn"></p>
+        </div>
+      </div>
+
+      <!-- Bazi + Five Elements + Hexagram Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Bazi Pillars & Five Elements -->
+        <div class="lg:col-span-7 glass-panel rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <h3 class="font-serif-cn text-base font-bold text-amber-300">四柱八字 & 五行能量</h3>
+            <span id="resNayin" class="text-xs px-2 py-0.5 rounded bg-amber-400/10 text-amber-200 border border-amber-400/25">海中金命</span>
+          </div>
+
+          <!-- 4 Pillars -->
+          <div id="baziPillars" class="grid grid-cols-4 gap-2.5">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Five Elements Bars -->
+          <div class="space-y-2.5 pt-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">五行强弱分布</span>
+              <span id="resElementAdvice" class="text-cyan-300 font-medium">喜用神：木 / 火</span>
+            </div>
+            <div id="elementsBars" class="space-y-2">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Hexagram Card -->
+        <div class="lg:col-span-5 glass-panel rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+              <h3 class="font-serif-cn text-base font-bold text-amber-300">本卦成象</h3>
+              <span id="resHexCode" class="font-mono-tech text-xs text-slate-400">第 1 卦</span>
+            </div>
+
+            <div class="flex items-center gap-4 bg-black/35 p-3.5 rounded-xl border border-white/5 mb-3">
+              <div id="resHexSvg" class="w-20 shrink-0 flex flex-col-reverse gap-1.5 py-1">
+                <!-- 6 lines -->
+              </div>
+              <div>
+                <div id="resHexName" class="font-serif-cn text-xl font-black text-amber-200">乾为天</div>
+                <div id="resHexSub" class="text-xs text-cyan-300 mt-0.5">上乾下乾 · 元亨利贞</div>
+                <div id="resMovingYao" class="text-[11px] text-rose-300 mt-1">动爻：九五飞龙在天</div>
+              </div>
+            </div>
+
+            <p id="resHexPoem" class="font-serif-cn text-xs sm:text-sm text-slate-300 leading-relaxed bg-white/[0.03] p-3 rounded-xl border border-white/5"></p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+            <span class="text-slate-400">变卦趋势：</span>
+            <span id="resChangedHex" class="font-serif-cn font-bold text-emerald-300">→ 天风姤</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Advice & Almanac -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="glass-panel rounded-2xl p-4 space-y-2">
+          <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+            <span>✅ 今日宜</span>
+          </div>
+          <p id="resGoodFor" class="text-sm text-slate-200 leading-relaxed"></p>
+        </div>
+        <div class="glass-panel rounded-2xl p-4 space-y-2">
+          <div class="text-xs font-bold text-rose-400 flex items-center gap-1.5">
+            <span>🚫 今日忌</span>
+          </div>
+          <p id="resBadFor" class="text-sm text-slate-200 leading-relaxed"></p>
+        </div>
+        <div class="glass-panel rounded-2xl p-4 space-y-2">
+          <div class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+            <span>🧭 开运参数</span>
+          </div>
+          <div id="resLuckyMeta" class="text-xs text-slate-300 space-y-1"></div>
+        </div>
+      </div>
+
+      <!-- Secret Kit / Extra Advice -->
+      <div class="glass-panel rounded-2xl p-4 sm:p-5 border border-cyan-400/20">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="font-serif-cn text-sm font-bold text-cyan-300">🎁 大师临别锦囊</h3>
+            <p class="text-xs text-slate-400 mt-0.5">玄机子临走前塞给你的加密纸条，拆开看看今天要注意什么坑。</p>
+          </div>
+          <button id="btnOpenKit" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/40 transition cursor-pointer">
+            拆开锦囊
+          </button>
+        </div>
+        <div id="kitContent" class="hidden mt-3 p-3.5 rounded-xl bg-cyan-950/30 border border-cyan-400/25 text-sm text-cyan-100 leading-relaxed"></div>
+      </div>
+
+      <!-- Bottom Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+        <button id="btnBackToInput" type="button" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition cursor-pointer">
+          ↺ 再求一签
+        </button>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button id="btnShareResult" type="button" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 transition cursor-pointer">
+            🔗 复制分享链接
+          </button>
+          <button id="btnPosterModal" type="button" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/40 transition cursor-pointer">
+            🖼️ 生成灵符海报
+          </button>
+          <button id="btnCopyResult" type="button" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 transition cursor-pointer">
+            📋 复制签文
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: Two-Person Compatibility (双人合盘) -->
+    <section id="viewMatch" class="hidden space-y-5">
+      <div class="glass-panel gold-border-glow rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div>
+            <h2 class="font-serif-cn text-lg font-bold text-amber-300">双人八字合盘 · 赛博缘分局</h2>
+            <p class="text-xs text-slate-400 mt-0.5">拉上你的损友、开黑搭子或心动对象，测测你们的五行是相生还是互克。</p>
+          </div>
+          <span class="font-mono-tech text-[11px] text-cyan-300">DUO // SYNC</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-black/35 border border-white/10 space-y-3">
+            <div class="text-xs font-bold text-amber-300">👤 甲方缘主</div>
+            <input id="matchNameA" type="text" maxlength="14" placeholder="姓名/昵称（如：小弈）" class="oracle-input w-full px-3 py-2 rounded-lg text-sm" />
+            <input id="matchDateA" type="date" value="2008-08-08" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-3 py-2 rounded-lg text-sm font-mono-tech" />
+          </div>
+          <div class="p-4 rounded-xl bg-black/35 border border-white/10 space-y-3">
+            <div class="text-xs font-bold text-cyan-300">👤 乙方缘主</div>
+            <input id="matchNameB" type="text" maxlength="14" placeholder="姓名/昵称（如：老王）" class="oracle-input w-full px-3 py-2 rounded-lg text-sm" />
+            <input id="matchDateB" type="date" value="2007-11-11" min="1920-01-01" max="2026-12-31" class="oracle-input w-full px-3 py-2 rounded-lg text-sm font-mono-tech" />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <div class="flex items-center gap-2">
+            <label for="matchRelation" class="text-xs text-slate-400">测算关系：</label>
+            <select id="matchRelation" class="oracle-input px-3 py-2 rounded-xl text-xs cursor-pointer">
+              <option value="开黑搭档">🎮 开黑搭档</option>
+              <option value="损友互坑">🤡 损友互坑</option>
+              <option value="暧昧心动">💘 暧昧心动</option>
+              <option value="创业合伙">🚀 创业/项目合伙</option>
+            </select>
+          </div>
+          <button id="btnStartMatch" type="button" class="px-6 py-2.5 rounded-xl font-serif-cn text-sm font-bold bg-gradient-to-r from-amber-400 to-cyan-400 text-slate-950 hover:brightness-110 transition cursor-pointer">
+            ⚡ 立即合盘推演
+          </button>
+        </div>
+      </div>
+
+      <!-- Match Output -->
+      <div id="matchResultCard" class="hidden glass-panel rounded-2xl p-5 sm:p-6 border border-cyan-400/30 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div id="matchPairNames" class="font-serif-cn text-xl font-black text-amber-300">甲方 × 乙方</div>
+            <div id="matchDuoTitle" class="text-sm font-semibold text-cyan-300 mt-0.5">水火既济 · 最佳损友</div>
+          </div>
+          <div class="text-right">
+            <div id="matchScoreText" class="font-mono-tech text-3xl font-black text-emerald-400">88%</div>
+            <div class="text-[11px] text-slate-400">天机契合度</div>
+          </div>
+        </div>
+
+        <div class="w-full h-3 bg-white/5 rounded-full overflow-hidden">
+          <div id="matchScoreBar" class="h-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-400 rounded-full transition-all duration-700" style="width: 0%"></div>
+        </div>
+
+        <div id="matchPillarsRow" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"></div>
+
+        <div class="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2">
+          <div class="text-xs font-serif-cn text-amber-400">【玄机子合盘批注】</div>
+          <p id="matchVerdict" class="text-sm text-slate-200 leading-relaxed"></p>
+        </div>
+
+        <div id="sharedMatchBanner" class="hidden px-3.5 py-2 rounded-xl bg-cyan-500/15 border border-cyan-400/35 text-xs text-cyan-200 flex items-center justify-between gap-2">
+          <span id="sharedMatchText">👀 正在围观好友的双人合盘</span>
+          <button id="btnPlayOwnMatch" type="button" class="shrink-0 px-3 py-1 rounded-lg bg-cyan-400 text-slate-950 font-semibold cursor-pointer">✨ 我也要测合盘</button>
+        </div>
+        <div class="flex flex-wrap justify-end gap-2">
+          <button id="btnShareMatch" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 transition cursor-pointer">
+            🔗 复制合盘链接
+          </button>
+          <button id="btnCopyMatch" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 transition cursor-pointer">
+            📋 复制合盘结果
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: Yes/No Decision Divination (决断问事 · 赛博掷筊) -->
+    <section id="viewDecide" class="hidden space-y-5">
+      <div class="glass-panel gold-border-glow rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div>
+            <h2 class="font-serif-cn text-lg font-bold text-amber-300">天机决断局 · 赛博掷圣杯</h2>
+            <p class="text-xs text-slate-400 mt-0.5">纠结某件事「做还是不做」？写下你的纠结，向天道掷出一对红木筊杯。</p>
+          </div>
+          <span class="font-mono-tech text-[11px] text-rose-300">DECIDE // BWEI</span>
+        </div>
+
+        <div>
+          <label for="decideInput" class="block text-xs text-slate-400 mb-1.5">你要决断之事（越具体越准）</label>
+          <input id="decideInput" type="text" maxlength="48" placeholder="例如：今晚要不要点一份炸鸡当夜宵？" class="oracle-input w-full px-3.5 py-2.5 rounded-xl text-sm" />
+          <div class="flex flex-wrap gap-2 mt-2.5">
+            <button type="button" data-preset="今晚要不要点夜宵？" class="decide-preset px-2.5 py-1 rounded-lg text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition cursor-pointer">🍗 今晚点不点夜宵</button>
+            <button type="button" data-preset="现在要不要主动发消息给 TA？" class="decide-preset px-2.5 py-1 rounded-lg text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition cursor-pointer">💬 要不要主动发消息</button>
+            <button type="button" data-preset="这波要不要剁手买下购物车里的东西？" class="decide-preset px-2.5 py-1 rounded-lg text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition cursor-pointer">🛒 要不要剁手下单</button>
+            <button type="button" data-preset="今天先肝正事还是先摸鱼打两把？" class="decide-preset px-2.5 py-1 rounded-lg text-[11px] bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition cursor-pointer">🎮 先肝还是先摸鱼</button>
+          </div>
+        </div>
+
+        <!-- Mode & Moon Blocks Stage -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-black/35 rounded-2xl p-4 border border-white/10">
+          <div class="md:col-span-7 flex flex-col items-center justify-center py-3">
+            <div class="flex items-center justify-center gap-6 mb-3">
+              <!-- Left Moon Block -->
+              <div id="bweiLeft" class="w-24 h-14 rounded-full bg-gradient-to-br from-rose-600 to-rose-900 border-2 border-amber-400/60 flex items-center justify-center shadow-lg shadow-rose-500/20 transition-transform duration-500">
+                <span class="font-serif-cn text-sm font-bold text-amber-200">阳面</span>
+              </div>
+              <!-- Right Moon Block -->
+              <div id="bweiRight" class="w-24 h-14 rounded-full bg-gradient-to-br from-slate-800 to-slate-950 border-2 border-amber-400/40 flex items-center justify-center shadow-lg transition-transform duration-500">
+                <span class="font-serif-cn text-sm font-bold text-slate-300">阴面</span>
+              </div>
+            </div>
+            <div id="bweiStatusLabel" class="text-xs text-slate-400 font-mono-tech">准备就绪 · 点击右侧掷出圣杯</div>
+          </div>
+
+          <div class="md:col-span-5 space-y-3">
+            <div>
+              <label for="decideRule" class="block text-[11px] text-slate-400 mb-1">问卜规矩</label>
+              <select id="decideRule" class="oracle-input w-full px-3 py-2 rounded-xl text-xs cursor-pointer">
+                <option value="single">⚡ 一掷定音（干脆利落）</option>
+                <option value="triple">🔥 三圣杯挑战（连续三次圣杯才准行）</option>
+              </select>
+            </div>
+            <div id="tripleTracker" class="hidden flex items-center justify-between text-xs bg-white/5 px-3 py-2 rounded-xl border border-white/10">
+              <span class="text-slate-400">圣杯连击：</span>
+              <span id="tripleCount" class="font-mono-tech font-bold text-amber-300">0 / 3</span>
+            </div>
+            <button id="btnThrowBwei" type="button" class="relative overflow-hidden select-none touch-none w-full py-3 rounded-xl font-serif-cn text-sm font-bold bg-gradient-to-r from-rose-600 via-amber-500 to-amber-400 text-slate-950 shadow-lg shadow-rose-500/20 hover:brightness-110 active:scale-[0.98] transition cursor-pointer">
+              <span id="bweiChargeBar" class="absolute inset-y-0 left-0 w-0 bg-white/35 pointer-events-none transition-none"></span>
+              <span class="relative z-10">🙏 诚心掷筊（点按或长按蓄力）</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Result Card -->
+      <div id="decideResultCard" class="hidden glass-panel rounded-2xl p-5 sm:p-6 border border-amber-400/30 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div id="decideCupType" class="inline-flex items-center gap-1.5 text-xs font-mono-tech px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 mb-2">
+              圣杯（一阳一阴）
+            </div>
+            <h3 id="decideVerdictTitle" class="font-serif-cn text-2xl sm:text-3xl font-black text-amber-300">天机准奏 · 放手去做！</h3>
+            <p id="decideEcho" class="text-xs text-slate-400 mt-1"></p>
+          </div>
+          <div class="text-right">
+            <div id="decideConfidence" class="font-mono-tech text-3xl font-black text-amber-300">92%</div>
+            <div class="text-[11px] text-slate-400">建议执行指数</div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2">
+          <div class="text-xs font-serif-cn text-amber-400">【玄机子断语】</div>
+          <p id="decideComment" class="text-sm text-slate-200 leading-relaxed"></p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+            <span class="text-cyan-300 font-bold">⏰ 行动时机：</span>
+            <span id="decideTiming" class="text-slate-300"></span>
+          </div>
+          <div class="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+            <span class="text-rose-300 font-bold">🛡️ 备选退路：</span>
+            <span id="decideBackup" class="text-slate-300"></span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap justify-between gap-2 pt-1">
+          <button id="btnResetDecide" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/15 transition cursor-pointer">
+            ↺ 换件事再问
+          </button>
+          <div class="flex flex-wrap gap-2">
+            <button id="btnShareDecide" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 transition cursor-pointer">
+              🔗 复制决断链接
+            </button>
+            <button id="btnCopyDecide" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 transition cursor-pointer">
+              📋 复制决断结果
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Poster Preview Modal -->
+  <div id="posterModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel rounded-2xl p-4 sm:p-5 max-w-sm w-full border border-amber-400/30 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="font-serif-cn text-sm font-bold text-amber-300">专属赛博灵符海报</h3>
+        <button id="btnClosePoster" type="button" class="text-slate-400 hover:text-white text-sm cursor-pointer">✕ 关闭</button>
+      </div>
+      <div class="rounded-xl overflow-hidden border border-white/10 bg-black/50 flex justify-center">
+        <img id="posterPreviewImg" alt="赛博灵符海报" class="max-h-[65vh] w-auto object-contain" />
+      </div>
+      <div class="flex items-center justify-between gap-2">
+        <span class="text-[11px] text-slate-400">可长按保存或点右侧下载</span>
+        <a id="btnDownloadPoster" download="cyber_oracle_card.png" href="data:," class="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-400 hover:bg-amber-300 text-slate-950 transition cursor-pointer">
+          💾 下载海报 PNG
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-slate-900/95 text-amber-200 text-xs font-medium border border-amber-400/40 shadow-xl opacity-0 pointer-events-none transition-opacity duration-200">
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. Web Audio Synthesizer (Pure Web Audio API, zero external sound files)
+    // =========================================================================
+    const SoundFX = {
+      ctx: null,
+      muted: false,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+      },
+      playTone(freq, duration = 0.18, type = 'sine', gainVal = 0.08, delay = 0) {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(gainVal, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+      },
+      playCoin() {
+        // Crisp metallic clink using pentatonic harmonics
+        this.playTone(1318.5, 0.14, 'triangle', 0.09, 0);
+        this.playTone(1975.5, 0.18, 'sine', 0.07, 0.04);
+        this.playTone(2637.0, 0.22, 'sine', 0.05, 0.09);
+      },
+      playTick() {
+        this.playTone(660, 0.06, 'sine', 0.04, 0);
+      },
+      playWoodfish() {
+        this.playTone(420, 0.09, 'sine', 0.14, 0);
+        this.playTone(210, 0.11, 'triangle', 0.08, 0.01);
+      },
+      playBwei() {
+        this.playTone(580, 0.08, 'triangle', 0.12, 0);
+        this.playTone(490, 0.10, 'triangle', 0.10, 0.09);
+      },
+      playChargeStep(pct) {
+        this.playTone(280 + pct * 4.5, 0.05, 'sine', 0.035, 0);
+      },
+      vibrate(pattern) {
+        try {
+          if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(pattern);
+          }
+        } catch (e) {}
+      },
+      playReveal() {
+        // Ancient Chinese pentatonic chord (Gong-Shang-Jue-Zhi-Yu)
+        const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+        notes.forEach((n, i) => {
+          this.playTone(n, 0.55, 'triangle', 0.06, i * 0.065);
+        });
+      }
+    };
+
+    // =========================================================================
+    // 2. Traditional Chinese Bazi & Hexagram Knowledge Base
+    // =========================================================================
+    const STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const BRANCHES = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    const ZODIAC = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+
+    const STEM_EL = {
+      '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
+      '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
+    };
+    const BRANCH_EL = {
+      '子': '水', '丑': '土', '寅': '木', '卯': '木', '辰': '土', '巳': '火',
+      '午': '火', '未': '土', '申': '金', '酉': '金', '戌': '土', '亥': '水'
+    };
+
+    const NAYIN_LIST = [
+      '海中金', '炉中火', '大林木', '路旁土', '剑锋金',
+      '山头火', '涧下水', '城头土', '白蜡金', '杨柳木',
+      '泉中水', '屋上土', '霹雳火', '松柏木', '长流水',
+      '沙中金', '山下火', '平地木', '壁上土', '金箔金',
+      '覆灯火', '天河水', '大驿土', '钗钏金', '桑柘木',
+      '大溪水', '沙中土', '天上火', '石榴木', '大海水'
+    ];
+
+    // 8 Trigrams (bottom-to-top binary string: 1=Yang, 0=Yin)
+    const TRIGRAMS = {
+      '111': { name: '乾', nature: '天', el: '金' },
+      '011': { name: '兑', nature: '泽', el: '金' },
+      '101': { name: '离', nature: '火', el: '火' },
+      '001': { name: '震', nature: '雷', el: '木' },
+      '110': { name: '巽', nature: '风', el: '木' },
+      '010': { name: '坎', nature: '水', el: '水' },
+      '100': { name: '艮', nature: '山', el: '土' },
+      '000': { name: '坤', nature: '地', el: '土' }
+    };
+
+    // Representative 64-hexagram map (full 64 combinations generated cleanly from upper+lower trigrams)
+    const HEX_SPECIAL = {
+      '111111': { num: 1, name: '乾为天', tier: '上上签', poem: '潜龙勿用终有时，飞龙在天正当令。今日代码不报错，需求一遍全通过。' },
+      '000000': { num: 2, name: '坤为地', tier: '上吉', poem: '厚德载物稳如山，莫争一时风头先。把基础打牢，后面自然有大鱼上钩。' },
+      '111000': { num: 11, name: '地天泰', tier: '上上签', poem: '天地交泰万事兴，小往大来正当时。卡了许久的瓶颈，今天大概率能顺手打通。' },
+      '000111': { num: 12, name: '天地否', tier: '中平', poem: '暂遇小堵莫硬刚，不如泡杯热茶歇一歇。退一步海阔天空，别在无意义内耗里死磕。' },
+      '101010': { num: 63, name: '水火既济', tier: '上吉', poem: '水火相济功德圆，万事已成七八分。收尾阶段切忌大意，记得做好备份与存档。' },
+      '010101': { num: 64, name: '火水未济', tier: '中吉', poem: '局势尚在酝酿中，黎明之前最考验耐心。稳住心态别乱改主意，转机就在下一拐角。' },
+      '010010': { num: 29, name: '坎为水', tier: '中平', poem: '重险之中有真意，流水不争先而争滔滔不绝。遇到刁钻难题时，拆成小步逐个击破。' },
+      '101101': { num: 30, name: '离为火', tier: '上吉', poem: '光明普照思路清，灵感如花火般迸发。适合创作、表达、写段子或做亮眼的展示。' },
+      '001001': { num: 51, name: '震为雷', tier: '中吉', poem: '惊雷一声震百里，看似突发状况，实则是破局契机。大胆出手，别怕试错。' },
+      '110110': { num: 57, name: '巽为风', tier: '中吉', poem: '随风潜入润无声，靠沟通与借力最省力。多和靠谱的人聊两句，会有意外线索。' },
+      '100100': { num: 52, name: '艮为山', tier: '中平', poem: '动静有时山不移，该停的时候果断止损。今日宜复盘整理，不宜盲目开新战线。' },
+      '011011': { num: 58, name: '兑为泽', tier: '上吉', poem: '双泽相悦笑口开，人缘与口才在线。适合约饭、聊天、发布作品，容易收获好评。' }
+    };
+
+    const TIERS = ['上上签', '上吉', '中吉', '中平', '下下签（逆袭版）'];
+
+    const CYBER_TITLES = {
+      '木': ['青龙架构师', '春风修仙客', '灵根码农', '木系摸鱼散仙'],
+      '火': ['丙火炼丹师', '离宫闪电手', '赤霄破局者', '燃魂熬夜冠军'],
+      '土': ['不动如山真君', '坤元守塔人', '厚土老实仙', '稳健基建狂魔'],
+      '金': ['剑气重构侠', '庚金断舍离', '白虎暴击手', '锐利挑刺仙尊'],
+      '水': ['玄冥算法师', '癸水摸鱼王', '沧海冲浪客', '灵动鬼才道人']
+    };
+
+    const TOPIC_VERDICTS = {
+      '运势': [
+        '今日天道带宽充足，气运如顺水行舟。上午适合推进核心主线任务，下午留点余量给突发灵感，切忌一边焦虑一边刷手机。',
+        '命盘显示你近期处于「蓄力转折期」，表面平平无奇，实则暗流涌动。别被别人节奏带偏，按自己的时间表走最稳。',
+        '玄机子掐指一算：你今天自带微弱「锦鲤 Buff」，虽然不会天上掉馅饼，但原本以为会翻车的小事大概率能惊险过关。',
+        '紫微星在云端打了个盹，主「无事便是小神仙」。今天适合低功耗运行，把日常小事顺顺当当办完就是大吉。',
+        '今日气场呈现「外冷内热」之象，别看开头有点懒散，一旦进入状态就会停不下来，晚上容易有意外的小惊喜。',
+        '天机提示：今天你的直觉准确率高达 88%，遇到二选一时别过度分析利弊，第一眼看中的那个往往更靠谱。',
+        '五行流转到「顺风局」，今天适合主动社交或去没去过的小店逛逛，换个环境能顺便把卡住的脑洞冲开。'
+      ],
+      '学业事业': [
+        '官星与印星相生，今天啃硬骨头效率极高！无论是刷题、写代码还是写稿子，前 25 分钟强行进入心流，后面会顺得像开了挂。',
+        '驿马星微动，主「折腾与迭代」。如果有卡住的 Bug 或卡文的段落，换个视角重写一遍比死盯原处快十倍。',
+        '财帛宫带一点小偏财信号，适合把做过的东西整理成作品或发出去展示，别藏着掖着，让别人看到你的手艺。',
+        '文昌星高照！今天记忆力与逻辑链条异常清晰，适合攻克平时最头疼的难点，或者把拖延了很久的待办清单清掉一半。',
+        '命格显示「先苦后甜」：刚开始可能会遇到一点小报错或返工，但只要稳住心态改完第一版，后面的进度条会飞起来。',
+        '今日贵人多在同行或同学之中，遇到卡壳别自己死磕两小时，去群里问一嘴或者找人讨论五分钟，立马豁然开朗。',
+        '守成中有进取之象：今天不适合盲目贪多开十个新坑，挑最核心的那一件事做到 90 分，回报率远超全面铺开。'
+      ],
+      '姻缘': [
+        '红鸾星在赛博云端闪了一下！有对象者今日宜少讲道理多夸人；单身者别老宅在屏幕前，主动发一句幽默开场白会有奇效。',
+        '桃花带水，主「聊得来」。最近容易遇到脑洞同频的人，但切忌上来就自我感动，保持松弛感反而最迷人。',
+        '命盘提示：感情之事急不得，先把自己的生活过得热气腾腾，对的人自然会被你的气场吸过来。',
+        '今日月老服务器响应极快！适合分享一首好听的歌、一张好看的晚霞照片，或者一个沙雕段子，比干巴巴问「在吗」管用一万倍。',
+        '桃花位偏东，主「旧识升温」或「偶遇同好」。平时一起打游戏、聊共同爱好的朋友里，说不定就藏着潜在缘分。',
+        '玄机子提醒：今天说话记得留三分温柔，别把工作/学习里的严谨杠精劲儿带到聊天里，多接梗少说教，好感度自动 +10。'
+      ],
+      '渡劫': [
+        '雷劫虽响，实为洗髓！你眼下烦心的事看似是坑，其实是逼你升级装备的经验包。今晚早睡半小时，明天醒来战力翻倍。',
+        '天机显示「破而后立」之象：该断的无效社交、该删的冗余代码、该放下的内耗，今天一刀切掉，立刻神清气爽。',
+        '别慌，这波属于「系统例行热更新」，短暂卡顿是为了后面跑得更流畅。稳住底盘，天塌下来有高个子顶着。',
+        '九重天劫已过七八，剩下的只是余波震荡。今天最忌讳自己吓自己，把最坏的结果想一遍，你会发现其实也没啥大不了。',
+        '破局关键在于「换个姿势」：硬撞南墙不如绕道走，把大麻烦拆成今天能干完的 15 分钟小任务，焦虑瞬间减半。',
+        '玄机子赠你一道「赛博静心符」：外界越吵、事情越乱，你越要慢半拍做决定。今晚洗个热水澡，明天自见分晓。'
+      ]
+    };
+
+    const GOOD_LIST = [
+      '写几行优雅代码 / 删掉一段冗余逻辑',
+      '点一杯少糖冰美式或热乌龙',
+      '给好久没联系的损友发个抽象表情包',
+      '把桌面的乱七八糟文件归档一次',
+      '戴上耳机听一首节奏感强的纯音乐',
+      '记录一个突然冒出来的离谱灵感',
+      '十一点半前乖乖上床躺平',
+      '去楼下散步十分钟顺便吹吹风',
+      '把拖了三天的那件小事 5 分钟解决掉',
+      '夸一句今天帮到你的人'
+    ];
+
+    const BAD_LIST = [
+      '在没保存的情况下直接关掉编辑器',
+      '跟杠精在评论区对线超过三回合',
+      '深夜两点突然决定开启一个宏大新项目',
+      '空腹喝冰饮或连续久坐超过两小时',
+      '因为别人的一句无心之言自我内耗',
+      '在状态最差时做重大决定',
+      '一边刷短视频一边假装自己在休息',
+      '明知道会后悔还要点开前任/旧账',
+      '不看天气预报就穿单衣出门'
+    ];
+
+    const KIT_SECRETS = [
+      '【隐藏锦囊】玄机子偷偷告诉你：今天遇到拿不准的选择时，抛硬币在空中的那一秒，你心里其实早就有答案了——顺着那个直觉走。',
+      '【防坑口诀】「凡事留一手，Git 常提交；情绪上头时，先喝水三口。」记住这十六字真言，可避开今日 80% 的无妄之灾。',
+      '【赛博护身符】系统检测到你近期精神消耗偏大，特批今日免除一次自我批评。哪怕今天只完成了 20% 的计划，也算赢！',
+      '【彩蛋批注】你命格里藏着「幽默化解一切」的隐藏天赋，遇到尴尬或麻烦事时，试着把它当成未来的搞笑素材，瞬间就不慌了。',
+      '【天道小纸条】今天如果有人请你喝奶茶或约你出门，别第一时间拒绝——你的偏财与贵人运正藏在这些随机事件里。',
+      '【逆袭秘籍】把手机倒扣在桌上专注 25 分钟，你会惊讶地发现自己今天的战斗力其实高得离谱。',
+      '【道祖偏爱】本签附带一次「小确幸触发器」：今晚留意一下路边的晚霞、猫咪或者刚出炉的小吃，好运正在路上。'
+    ];
+
+    // =========================================================================
+    // 3. State Management
+    // =========================================================================
+    const state = {
+      topic: '运势',
+      castYaos: [], // array of 6 numbers: 6 (old yin), 7 (young yang), 8 (young yin), 9 (old yang)
+      currentResult: null,
+      history: []
+    };
+
+    try {
+      const saved = localStorage.getItem('cyber_oracle_history_v1');
+      if (saved) state.history = JSON.parse(saved);
+    } catch (e) {}
+
+    function saveHistory() {
+      try {
+        localStorage.setItem('cyber_oracle_history_v1', JSON.stringify(state.history.slice(0, 12)));
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 4. Bazi & Hexagram Algorithms
+    // =========================================================================
+    function computeBazi(dateStr, hourIdx) {
+      const parts = (dateStr || '2008-08-08').split('-').map(Number);
+      const y = parts[0] || 2008;
+      const m = parts[1] || 8;
+      const d = parts[2] || 8;
+
+      // Year Pillar (approx solar year; 1984 is 甲子)
+      const yOffset = ((y - 1984) % 60 + 60) % 60;
+      const yStemIdx = yOffset % 10;
+      const yBranchIdx = yOffset % 12;
+
+      // Month Pillar (Five Tigers formula: 甲己之年丙作首)
+      // Month branch starts from 寅 (index 2) for month 1 (Feb approx)
+      const solarMonthIdx = (m + 10) % 12; // Feb(2)->0(寅), Jan(1)->11(丑)
+      const mBranchIdx = (solarMonthIdx + 2) % 12;
+      const mStemStart = [2, 4, 6, 8, 0][yStemIdx % 5];
+      const mStemIdx = (mStemStart + solarMonthIdx) % 10;
+
+      // Day Pillar (Reference: 1900-01-31 is 甲辰 day, index 40 in 60-cycle)
+      const refDate = Date.UTC(1900, 0, 31);
+      const targetDate = Date.UTC(y, m - 1, d);
+      const diffDays = Math.floor((targetDate - refDate) / 86400000);
+      const dOffset = ((diffDays + 40) % 60 + 60) % 60;
+      const dStemIdx = dOffset % 10;
+      const dBranchIdx = dOffset % 12;
+
+      // Hour Pillar (Five Rats formula: 甲己还加甲)
+      const hBranchIdx = Number(hourIdx) % 12;
+      const hStemStart = [0, 2, 4, 6, 8][dStemIdx % 5];
+      const hStemIdx = (hStemStart + hBranchIdx) % 10;
+
+      const pillars = [
+        { label: '年柱', stem: STEMS[yStemIdx], branch: BRANCHES[yBranchIdx] },
+        { label: '月柱', stem: STEMS[mStemIdx], branch: BRANCHES[mBranchIdx] },
+        { label: '日柱', stem: STEMS[dStemIdx], branch: BRANCHES[dBranchIdx] },
+        { label: '时柱', stem: STEMS[hStemIdx], branch: BRANCHES[hBranchIdx] }
+      ];
+
+      // Five Elements count
+      const counts = { '金': 0, '木': 0, '水': 0, '火': 0, '土': 0 };
+      pillars.forEach(p => {
+        counts[STEM_EL[p.stem]] += 1.2;
+        counts[BRANCH_EL[p.branch]] += 1.0;
+      });
+
+      const dayMasterEl = STEM_EL[pillars[2].stem];
+      const nayin = NAYIN_LIST[Math.floor(yOffset / 2) % 30];
+      const zodiac = ZODIAC[yBranchIdx];
+
+      return { pillars, counts, dayMasterEl, nayin, zodiac, seed: Math.abs(diffDays) + hBranchIdx * 17 };
+    }
+
+    function buildHexagram(yaos) {
+      // yaos[0..5] bottom to top; 7,9 -> Yang(1), 6,8 -> Yin(0)
+      const baseBits = yaos.map(v => (v === 7 || v === 9 ? '1' : '0')).join('');
+      const changedBits = yaos.map(v => {
+        if (v === 9) return '0'; // old yang -> yin
+        if (v === 6) return '1'; // old yin -> yang
+        return v === 7 ? '1' : '0';
+      }).join('');
+
+      const lower = TRIGRAMS[baseBits.slice(0, 3)];
+      const upper = TRIGRAMS[baseBits.slice(3, 6)];
+      const chLower = TRIGRAMS[changedBits.slice(0, 3)];
+      const chUpper = TRIGRAMS[changedBits.slice(3, 6)];
+
+      let info = HEX_SPECIAL[baseBits];
+      if (!info) {
+        const hashNum = (parseInt(baseBits, 2) % 64) + 1;
+        const autoName = upper.name === lower.name
+          ? `${upper.name}为${upper.nature}`
+          : `${upper.nature}${lower.nature}·${upper.name}${lower.name}卦`;
+        const autoTier = TIERS[(parseInt(baseBits, 2) + yaos.reduce((a, b) => a + b, 0)) % 4];
+        info = {
+          num: hashNum,
+          name: autoName,
+          tier: autoTier,
+          poem: `上${upper.nature}下${lower.nature}，${upper.el}${lower.el}相映成趣。顺势而为则事半功倍，守正出奇必有回响。`
+        };
+      }
+
+      const movingIndices = [];
+      yaos.forEach((v, i) => { if (v === 6 || v === 9) movingIndices.push(i + 1); });
+      const movingText = movingIndices.length
+        ? `动爻：第 ${movingIndices.join('、')} 爻发动（主变局）`
+        : '六爻静定（主稳态推进）';
+
+      const changedName = chUpper.name === chLower.name
+        ? `${chUpper.name}为${chUpper.nature}`
+        : `${chUpper.nature}${chLower.nature}·${chUpper.name}${chLower.name}`;
+
+      return {
+        baseBits,
+        changedBits,
+        yaos,
+        num: info.num,
+        name: info.name,
+        sub: `上${upper.name}（${upper.nature}）下${lower.name}（${lower.nature}）`,
+        tier: info.tier,
+        poem: info.poem,
+        movingText,
+        changedName: baseBits === changedBits ? '本卦不动 · 稳如泰山' : `→ ${changedName}`
+      };
+    }
+
+    // =========================================================================
+    // 5. DOM Helpers & UI Rendering
+    // =========================================================================
+    const $ = id => document.getElementById(id);
+
+    function showToast(msg) {
+      const box = $('toastBox');
+      box.textContent = msg;
+      box.classList.remove('opacity-0');
+      box.classList.add('opacity-100');
+      clearTimeout(box._t);
+      box._t = setTimeout(() => {
+        box.classList.remove('opacity-100');
+        box.classList.add('opacity-0');
+      }, 2200);
+    }
+
+    function renderYaoPreview() {
+      const list = $('yaoPreviewList');
+      const badge = $('castProgressBadge');
+      badge.textContent = `${state.castYaos.length} / 6 爻`;
+
+      if (state.castYaos.length === 0) {
+        list.innerHTML = `<div class="text-center text-xs text-slate-500 py-6">尚未起卦，请点击下方「摇一爻」或「一键六爻」</div>`;
+        return;
+      }
+
+      const yaoNames = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻'];
+      list.innerHTML = state.castYaos.map((val, idx) => {
+        const isYang = val === 7 || val === 9;
+        const isMoving = val === 6 || val === 9;
+        const tag = val === 9 ? '老阳 ○' : val === 6 ? '老阴 ✕' : val === 7 ? '少阳' : '少阴';
+        const barHtml = isYang
+          ? `<div class="h-2.5 flex-1 rounded-sm ${isMoving ? 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.6)]' : 'bg-amber-300'}"></div>`
+          : `<div class="flex-1 flex gap-2.5"><div class="h-2.5 flex-1 rounded-sm ${isMoving ? 'bg-rose-400' : 'bg-cyan-300/80'}"></div><div class="h-2.5 flex-1 rounded-sm ${isMoving ? 'bg-rose-400' : 'bg-cyan-300/80'}"></div></div>`;
+
+        return `
+          <div class="flex items-center gap-2.5 text-[11px]">
+            <span class="w-8 text-slate-400 font-serif-cn">${yaoNames[idx]}</span>
+            ${barHtml}
+            <span class="w-14 text-right font-mono-tech ${isMoving ? 'text-rose-300 font-semibold' : 'text-slate-400'}">${tag}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function castSingleYao() {
+      if (state.castYaos.length >= 6) {
+        showToast('六爻已满！请点击「立即开算」或点「重摇」');
+        return;
+      }
+      SoundFX.playCoin();
+      // Animate coins
+      const coins = [0, 1, 2].map(i => $('coin' + i));
+      const results = coins.map((el, i) => {
+        el.classList.remove('coin-flipping');
+        void el.offsetWidth;
+        el.classList.add('coin-flipping');
+        const isHead = Math.random() >= 0.5; // Head = 3 (Yang), Tail = 2 (Yin)
+        const inner = el.querySelector('div');
+        inner.textContent = isHead ? '阳' : '阴';
+        inner.className = `w-4 h-4 border rotate-45 flex items-center justify-center text-[9px] font-serif-cn ${isHead ? 'border-amber-300 text-amber-200' : 'border-cyan-300 text-cyan-200'}`;
+        return isHead ? 3 : 2;
+      });
+      const sum = results[0] + results[1] + results[2]; // 6, 7, 8, or 9
+      state.castYaos.push(sum);
+      renderYaoPreview();
+    }
+
+    function castAllYaos() {
+      state.castYaos = [];
+      for (let i = 0; i < 6; i++) {
+        const sum = [0, 1, 2].reduce(acc => acc + (Math.random() >= 0.5 ? 3 : 2), 0);
+        state.castYaos.push(sum);
+      }
+      SoundFX.playCoin();
+      [0, 1, 2].forEach(i => {
+        const el = $('coin' + i);
+        el.classList.remove('coin-flipping');
+        void el.offsetWidth;
+        el.classList.add('coin-flipping');
+      });
+      renderYaoPreview();
+      showToast('⚡ 六爻已一键聚灵成卦');
+    }
+
+    function generateOracleRecord() {
+      // Ensure 6 yaos exist
+      if (state.castYaos.length < 6) {
+        while (state.castYaos.length < 6) {
+          const sum = [0, 1, 2].reduce(acc => acc + (Math.random() >= 0.5 ? 3 : 2), 0);
+          state.castYaos.push(sum);
+        }
+        renderYaoPreview();
+      }
+
+      const name = $('inputName').value.trim() || '有缘人';
+      const gender = $('inputGender').value;
+      const birthDate = $('inputBirthDate').value || '2008-08-08';
+      const birthHour = $('inputBirthHour').value;
+      const mood = $('inputMood').value;
+      const question = $('inputQuestion').value.trim();
+
+      const bazi = computeBazi(birthDate, birthHour);
+      const hex = buildHexagram([...state.castYaos]);
+
+      // Pick weakest & strongest elements
+      const elEntries = Object.entries(bazi.counts).sort((a, b) => a[1] - b[1]);
+      const weakestEl = elEntries[0][0];
+      const strongestEl = elEntries[elEntries.length - 1][0];
+
+      const hash = bazi.seed + hex.num * 31 + name.length * 13 + state.topic.length * 7;
+      const titlePool = CYBER_TITLES[bazi.dayMasterEl];
+      const cyberTitle = titlePool[hash % titlePool.length];
+
+      const topicPool = TOPIC_VERDICTS[state.topic] || TOPIC_VERDICTS['运势'];
+      let mainVerdict = topicPool[hash % topicPool.length];
+      if (mood === 'chill') {
+        mainVerdict += '（另：感应到缘主心想摸鱼，今日天道特批允许合理划水二十分钟。）';
+      } else if (mood === 'fire') {
+        mainVerdict += '（另：你今日阳气偏旺，适合主动出击，但记得给话留三分余地。）';
+      } else if (mood === 'chaos') {
+        mainVerdict += '（另：心绪微乱时莫慌，先挑最小的一件事做完，气场立马回稳。）';
+      }
+
+      const directions = ['正东（青龙位）', '东南（文昌位）', '正南（朱雀位）', '西南（太阴位）', '正北（玄武位）'];
+      const colors = {
+        '木': '松石青 / 翠绿', '火': '朱砂红 / 落日橘',
+        '土': '琥珀金 / 暖咖', '金': '钛银白 / 香槟金', '水': '极夜蓝 / 深海青'
+      };
+
+      const record = {
+        id: 'ORACLE-' + String((hash % 9000) + 1000),
+        timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+        name,
+        gender,
+        birthDate,
+        topic: state.topic,
+        question,
+        bazi,
+        hex,
+        cyberTitle,
+        mainVerdict,
+        weakestEl,
+        strongestEl,
+        goodFor: GOOD_LIST[hash % GOOD_LIST.length],
+        badFor: BAD_LIST[(hash + 3) % BAD_LIST.length],
+        luckyColor: colors[weakestEl],
+        luckyNum: ((hash % 9) + 1) + '、' + (((hash + 4) % 9) + 1),
+        luckyDir: directions[hash % directions.length],
+        kitSecret: KIT_SECRETS[hash % KIT_SECRETS.length]
+      };
+
+      return record;
+    }
+
+    function renderResult(rec) {
+      state.currentResult = rec;
+      $('resSerial').textContent = `#${rec.id}`;
+      $('resTopicBadge').textContent = `所问：${rec.topic}`;
+      $('resZodiacBadge').textContent = `生肖属${rec.bazi.zodiac} · ${rec.gender}`;
+      $('resUserName').textContent = rec.name;
+      $('resCyberTitle').textContent = rec.cyberTitle;
+      $('resQuestionEcho').textContent = rec.question ? `心中所念：「${rec.question}」` : `推演时间：${rec.timestamp} · 已完成量子八字校对`;
+      $('stampTier').textContent = rec.hex.tier;
+      $('resMainVerdict').textContent = rec.mainVerdict;
+      $('resNayin').textContent = `${rec.bazi.nayin}命 · 日主属${rec.bazi.dayMasterEl}`;
+
+      // Render 4 Pillars
+      const elColors = {
+        '金': 'text-amber-300', '木': 'text-emerald-400',
+        '水': 'text-cyan-400', '火': 'text-rose-400', '土': 'text-yellow-500'
+      };
+      $('baziPillars').innerHTML = rec.bazi.pillars.map(p => `
+        <div class="bg-black/40 border border-white/10 rounded-xl p-2.5 text-center">
+          <div class="text-[11px] text-slate-400 mb-1">${p.label}</div>
+          <div class="font-serif-cn text-xl font-black ${elColors[STEM_EL[p.stem]]}">${p.stem}</div>
+          <div class="font-serif-cn text-xl font-black ${elColors[BRANCH_EL[p.branch]]}">${p.branch}</div>
+          <div class="text-[10px] text-slate-500 mt-1">${STEM_EL[p.stem]}${BRANCH_EL[p.branch]}</div>
+        </div>
+      `).join('');
+
+      // Render Five Elements Bars
+      const maxCount = Math.max(...Object.values(rec.bazi.counts), 3);
+      const barColors = {
+        '金': 'bg-amber-400', '木': 'bg-emerald-400',
+        '水': 'bg-cyan-400', '火': 'bg-rose-500', '土': 'bg-yellow-600'
+      };
+      $('resElementAdvice').textContent = `命盘偏${rec.strongestEl}，喜补【${rec.weakestEl}】`;
+      $('elementsBars').innerHTML = ['金', '木', '水', '火', '土'].map(el => {
+        const val = rec.bazi.counts[el];
+        const pct = Math.min(100, Math.round((val / maxCount) * 100));
+        return `
+          <div class="flex items-center gap-2.5 text-xs">
+            <span class="w-5 font-serif-cn font-bold ${elColors[el]}">${el}</span>
+            <div class="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+              <div class="h-full ${barColors[el]} rounded-full transition-all duration-700" style="width: ${pct}%"></div>
+            </div>
+            <span class="w-9 text-right font-mono-tech text-[11px] text-slate-400">${val.toFixed(1)}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Render Hexagram
+      $('resHexCode').textContent = `第 ${rec.hex.num} 卦`;
+      $('resHexName').textContent = rec.hex.name;
+      $('resHexSub').textContent = rec.hex.sub;
+      $('resMovingYao').textContent = rec.hex.movingText;
+      $('resHexPoem').textContent = rec.hex.poem;
+      $('resChangedHex').textContent = rec.hex.changedName;
+
+      $('resHexSvg').innerHTML = rec.hex.yaos.map(val => {
+        const isYang = val === 7 || val === 9;
+        const isMoving = val === 6 || val === 9;
+        if (isYang) {
+          return `<div class="h-2 w-full rounded-sm ${isMoving ? 'bg-rose-400' : 'bg-amber-300'}"></div>`;
+        }
+        return `<div class="flex gap-2 w-full"><div class="h-2 flex-1 rounded-sm ${isMoving ? 'bg-rose-400' : 'bg-cyan-300'}"></div><div class="h-2 flex-1 rounded-sm ${isMoving ? 'bg-rose-400' : 'bg-cyan-300'}"></div></div>`;
+      }).join('');
+
+      // Render Almanac & Lucky Meta
+      $('resGoodFor').textContent = rec.goodFor;
+      $('resBadFor').textContent = rec.badFor;
+      $('resLuckyMeta').innerHTML = `
+        <div>幸运色：<span class="text-amber-200">${rec.luckyColor}</span></div>
+        <div>幸运数：<span class="font-mono-tech text-cyan-300">${rec.luckyNum}</span></div>
+        <div>贵人位：<span class="text-emerald-300">${rec.luckyDir}</span></div>
+      `;
+
+      // Reset Kit
+      $('kitContent').classList.add('hidden');
+      $('kitContent').textContent = rec.kitSecret;
+      $('btnOpenKit').textContent = '拆开锦囊';
+      $('btnOpenKit').disabled = false;
+
+      // Re-trigger stamp animation
+      const stamp = $('resultStamp');
+      stamp.classList.remove('animate-stamp');
+      void stamp.offsetWidth;
+      stamp.classList.add('animate-stamp');
+
+      $('viewInput').classList.add('hidden');
+      $('viewRitual').classList.add('hidden');
+      $('viewResult').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderHistoryList() {
+      $('historyCount').textContent = state.history.length;
+      const list = $('historyList');
+      if (state.history.length === 0) {
+        list.innerHTML = `<div class="col-span-2 text-xs text-slate-500 py-3 text-center">暂无算卦记录，快去摇一卦吧～</div>`;
+        return;
+      }
+      list.innerHTML = state.history.map((item, idx) => `
+        <button type="button" data-hidx="${idx}" class="history-item-btn text-left p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition cursor-pointer">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-serif-cn font-bold text-amber-300">${item.name} · ${item.hex.name}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">${item.hex.tier}</span>
+          </div>
+          <div class="text-[11px] text-slate-400 mt-1 flex justify-between">
+            <span>问：${item.topic}</span>
+            <span class="font-mono-tech">${item.timestamp}</span>
+          </div>
+        </button>
+      `).join('');
+
+      list.querySelectorAll('.history-item-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const rec = state.history[Number(btn.dataset.hidx)];
+          if (rec) {
+            $('historyDrawer').classList.add('hidden');
+            renderResult(rec);
+          }
+        });
+      });
+    }
+
+    // =========================================================================
+    // 6. Ritual Animation Controller
+    // =========================================================================
+    let ritualTimer = null;
+
+    function startDivination() {
+      const record = generateOracleRecord();
+      state.history.unshift(record);
+      if (state.history.length > 12) state.history.pop();
+      saveHistory();
+      renderHistoryList();
+
+      $('viewInput').classList.add('hidden');
+      $('viewResult').classList.add('hidden');
+      $('viewRitual').classList.remove('hidden');
+      $('ritualLogs').innerHTML = '';
+
+      const lines = [
+        `[0x01] 读取缘主生辰：${record.birthDate} (${record.bazi.zodiac}年 · ${record.bazi.nayin})`,
+        `[0x02] 排布四柱八字：${record.bazi.pillars.map(p => p.stem + p.branch).join(' ')}`,
+        `[0x03] 校验五行能量：日主属${record.bazi.dayMasterEl}，喜用神为${record.weakestEl}...`,
+        `[0x04] 六爻成象完毕：得【${record.hex.name}】 · ${record.hex.tier}`
+      ];
+
+      let step = 0;
+      clearInterval(ritualTimer);
+      const finish = () => {
+        clearInterval(ritualTimer);
+        SoundFX.playReveal();
+        renderResult(record);
+      };
+
+      $('btnSkipRitual').onclick = finish;
+
+      ritualTimer = setInterval(() => {
+        if (step < lines.length) {
+          SoundFX.playTick();
+          const p = document.createElement('div');
+          p.textContent = lines[step];
+          $('ritualLogs').appendChild(p);
+          step++;
+        } else {
+          finish();
+        }
+      }, 420);
+    }
+
+    // =========================================================================
+    // 7. Background Particle System
+    // =========================================================================
+    function initParticles() {
+      const canvas = $('bgParticles');
+      const ctx = canvas.getContext('2d');
+      let w = 0, h = 0;
+      const dots = Array.from({ length: 45 }, () => ({
+        x: Math.random(),
+        y: Math.random(),
+        r: Math.random() * 1.6 + 0.5,
+        vx: (Math.random() - 0.5) * 0.0003,
+        vy: -Math.random() * 0.0004 - 0.0001,
+        gold: Math.random() > 0.35
+      }));
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function tick() {
+        ctx.clearRect(0, 0, w, h);
+        dots.forEach(d => {
+          d.x = (d.x + d.vx + 1) % 1;
+          d.y = (d.y + d.vy + 1) % 1;
+          ctx.beginPath();
+          ctx.arc(d.x * w, d.y * h, d.r, 0, Math.PI * 2);
+          ctx.fillStyle = d.gold ? 'rgba(245, 197, 66, 0.35)' : 'rgba(34, 211, 238, 0.3)';
+          ctx.fill();
+        });
+        requestAnimationFrame(tick);
+      }
+      tick();
+    }
+
+    // =========================================================================
+    // 7.5 Duo Match & Poster Canvas Generator
+    // =========================================================================
+    let meritTotal = 0;
+    try {
+      meritTotal = Number(localStorage.getItem('cyber_oracle_merit_v1') || 0);
+    } catch (e) {}
+
+    function renderMerit() {
+      $('meritCount').textContent = '+' + meritTotal;
+    }
+
+    let lastMatchText = '';
+    function runDuoMatch() {
+      const nameA = $('matchNameA').value.trim() || '甲方道友';
+      const nameB = $('matchNameB').value.trim() || '乙方道友';
+      const dateA = $('matchDateA').value || '2008-08-08';
+      const dateB = $('matchDateB').value || '2007-11-11';
+      const rel = $('matchRelation').value;
+
+      const bA = computeBazi(dateA, 6);
+      const bB = computeBazi(dateB, 6);
+
+      // Five elements generating & controlling pairs
+      const genMap = { '木': '火', '火': '土', '土': '金', '金': '水', '水': '木' };
+      const ctrlMap = { '木': '土', '土': '水', '水': '火', '火': '金', '金': '木' };
+
+      const elA = bA.dayMasterEl;
+      const elB = bB.dayMasterEl;
+      let baseScore = 72 + ((bA.seed + bB.seed) % 21);
+      let relationTag = '五行平和 · 默契搭子';
+      if (genMap[elA] === elB || genMap[elB] === elA) {
+        baseScore = Math.min(99, baseScore + 12);
+        relationTag = `${elA}${elB}相生 · 天作之合`;
+      } else if (elA === elB) {
+        baseScore = Math.min(95, baseScore + 6);
+        relationTag = `双${elA}比劫 · 臭味相投`;
+      } else if (ctrlMap[elA] === elB || ctrlMap[elB] === elA) {
+        baseScore = Math.max(58, baseScore - 8);
+        relationTag = `${elA}${elB}相克 · 相爱相杀`;
+      }
+
+      const relPools = {
+        '开黑搭档': [
+          `你们一个主${elA}一个主${elB}，打团时一个负责冲锋背锅，一个负责冷静收割。只要不抢同一个位置，上分如喝水！`,
+          `双人排位气场极稳！哪怕前期逆风被推到高地，你们俩总能靠一波离谱配合翻盘，属于越逆境越猛的组合。`,
+          `命盘显示你们语音沟通时废话极多但莫名默契，建议今晚直接约两把，赢了吹牛、输了互相甩锅，快乐拉满！`
+        ],
+        '损友互坑': [
+          `命盘显示你们聚在一起智商会自动减半、快乐直接翻倍。互相发抽象表情包的频率极高，建议锁死别去祸害别人。`,
+          `一个主${elA}、一个主${elB}，日常对话 90% 都是互相拆台，但真遇到事儿时对方绝对是第一个顶上来的靠谱损友。`,
+          `天机显示你们属于「绝佳饭搭子 + 吐槽机」配置，周末哪怕只是压马路瞎逛都能聊出三个小时的段子。`
+        ],
+        '暧昧心动': [
+          `气场磁场有明显共振！${elA}与${elB}交汇容易擦出奇妙火花，今天谁先主动发一句「在干嘛」，谁就掌握主动权。`,
+          `红鸾星在你们俩之间疯狂闪烁！聊天时别太端着，偶尔抛个小梗或分享日常碎片，好感度会蹭蹭往上涨。`,
+          `五行互补度极高，属于「相处不累、越聊越上头」的类型。找个机会约顿饭或一起散个步，氛围感直接到位！`
+        ],
+        '创业合伙': [
+          `一个擅长天马行空搞创意，一个擅长稳扎稳打兜底线。只要分工明确、账目清晰，一起折腾点小项目大概率能成！`,
+          `事业宫呈相辅相成之势：${nameA}负责破局开路，${nameB}擅长收口落地。别光停在群里画饼，今天就可以把第一步跑起来！`,
+          `你们俩的思维盲区刚好错开，讨论方案时容易吵出火花，但吵完做出来的成品往往比单干强出一大截。`
+        ]
+      };
+      const pool = relPools[rel] || relPools['损友互坑'];
+      const pickedDuoComment = pool[(bA.seed + bB.seed) % pool.length];
+
+      $('matchPairNames').textContent = `${nameA} × ${nameB}`;
+      $('matchDuoTitle').textContent = `${relationTag}（${rel}）`;
+      $('matchScoreText').textContent = `${baseScore}%`;
+      $('matchScoreBar').style.width = `${baseScore}%`;
+
+      $('matchPillarsRow').innerHTML = `
+        <div class="p-3 rounded-xl bg-black/35 border border-white/10">
+          <div class="text-amber-300 font-bold mb-1">${nameA} · 属${bA.zodiac}</div>
+          <div class="text-slate-300">日主：<span class="text-amber-200 font-semibold">${elA}</span> · ${bA.nayin}命</div>
+        </div>
+        <div class="p-3 rounded-xl bg-black/35 border border-white/10">
+          <div class="text-cyan-300 font-bold mb-1">${nameB} · 属${bB.zodiac}</div>
+          <div class="text-slate-300">日主：<span class="text-cyan-200 font-semibold">${elB}</span> · ${bB.nayin}命</div>
+        </div>
+      `;
+
+      $('matchVerdict').textContent = pickedDuoComment;
+      $('matchResultCard').classList.remove('hidden');
+      SoundFX.playReveal();
+
+      state.lastMatchData = { a: nameA, da: dateA, b: nameB, db: dateB, r: rel, sc: baseScore, tag: relationTag, v: pickedDuoComment, elA, elB, zA: bA.zodiac, zB: bB.zodiac, nA: bA.nayin, nB: bB.nayin };
+      lastMatchText = `【天机终端 · 双人合盘】\n${nameA}（${elA}） × ${nameB}（${elB}）\n关系：${rel} | 契合度：${baseScore}%\n称号：${relationTag}\n批注：${pickedDuoComment}`;
+    }
+
+    function encodeSharePayload(obj) {
+      const json = JSON.stringify(obj);
+      const bytes = new TextEncoder().encode(json);
+      let bin = '';
+      bytes.forEach(b => { bin += String.fromCharCode(b); });
+      return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function decodeSharePayload(str) {
+      const pad = str.length % 4 ? '='.repeat(4 - (str.length % 4)) : '';
+      const b64 = str.replace(/-/g, '+').replace(/_/g, '/') + pad;
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function copyTextSafe(text, successMsg) {
+      const fallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast(successMsg); }
+        catch (e) { showToast('复制失败，请手动复制地址栏'); }
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    function buildShareUrl(prefix, payload) {
+      const encoded = encodeSharePayload(payload);
+      const hash = `#${prefix}=${encoded}`;
+      try { window.history.replaceState(null, '', hash); } catch (e) {}
+      return window.location.href.split('#')[0] + hash;
+    }
+
+    function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+      let line = '';
+      let curY = y;
+      for (let i = 0; i < text.length; i++) {
+        const testLine = line + text[i];
+        if (ctx.measureText(testLine).width > maxWidth && line.length > 0) {
+          ctx.fillText(line, x, curY);
+          line = text[i];
+          curY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      if (line) {
+        ctx.fillText(line, x, curY);
+        curY += lineHeight;
+      }
+      return curY;
+    }
+
+    function generatePoster() {
+      const r = state.currentResult;
+      if (!r) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 720;
+      canvas.height = 1040;
+      const ctx = canvas.getContext('2d');
+
+      // Background
+      const grad = ctx.createLinearGradient(0, 0, 0, 1040);
+      grad.addColorStop(0, '#090b14');
+      grad.addColorStop(1, '#121626');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 720, 1040);
+
+      // Outer gold frame
+      ctx.strokeStyle = 'rgba(245, 197, 66, 0.45)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(24, 24, 672, 992);
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(34, 34, 652, 972);
+
+      // Title
+      ctx.fillStyle = '#f5c542';
+      ctx.font = 'bold 34px "Noto Serif SC", serif';
+      ctx.fillText('天机终端 · 赛博灵符', 60, 92);
+
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = '16px monospace';
+      ctx.fillText(`#${r.id}  |  ${r.birthDate}  |  生肖属${r.bazi.zodiac}`, 60, 126);
+
+      // Stamp
+      ctx.save();
+      ctx.translate(600, 110);
+      ctx.rotate(-0.15);
+      ctx.strokeStyle = '#ff453a';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(-55, -36, 110, 72);
+      ctx.fillStyle = '#ff453a';
+      ctx.font = 'bold 26px "Noto Serif SC", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.hex.tier.slice(0, 3), 0, 8);
+      ctx.restore();
+
+      // User Name & Title
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 30px "Noto Serif SC", serif';
+      ctx.fillText(`${r.name} · ${r.cyberTitle}`, 60, 192);
+
+      // Bazi Pillars
+      const pillarX = [60, 215, 370, 525];
+      r.bazi.pillars.forEach((p, i) => {
+        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+        ctx.fillRect(pillarX[i], 222, 135, 110);
+        ctx.strokeStyle = 'rgba(245,197,66,0.25)';
+        ctx.strokeRect(pillarX[i], 222, 135, 110);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.label, pillarX[i] + 67, 246);
+
+        ctx.fillStyle = '#fde68a';
+        ctx.font = 'bold 30px "Noto Serif SC", serif';
+        ctx.fillText(p.stem + p.branch, pillarX[i] + 67, 294);
+      });
+
+      // Hexagram Section
+      ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(60, 360, 600, 150);
+      ctx.fillStyle = '#f5c542';
+      ctx.font = 'bold 26px "Noto Serif SC", serif';
+      ctx.fillText(`本卦：${r.hex.name}`, 84, 405);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '16px sans-serif';
+      ctx.fillText(`${r.hex.sub}  |  ${r.hex.movingText}`, 84, 435);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '17px "Noto Serif SC", serif';
+      wrapCanvasText(ctx, r.hex.poem, 84, 470, 550, 26);
+
+      // Verdict Section
+      ctx.fillStyle = '#22d3ee';
+      ctx.font = 'bold 20px "Noto Serif SC", serif';
+      ctx.fillText('【玄机子 · 铁口直断】', 60, 560);
+      ctx.fillStyle = '#f1f5f9';
+      ctx.font = '21px "Noto Serif SC", serif';
+      const nextY = wrapCanvasText(ctx, r.mainVerdict, 60, 600, 600, 34);
+
+      // Almanac
+      const almY = Math.max(nextY + 25, 760);
+      ctx.fillStyle = '#34d399';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText(`✅ 今日宜：${r.goodFor}`, 60, almY);
+      ctx.fillStyle = '#fb7185';
+      ctx.fillText(`🚫 今日忌：${r.badFor}`, 60, almY + 38);
+      ctx.fillStyle = '#fde68a';
+      ctx.fillText(`🧭 开运：${r.luckyColor}  |  幸运数 ${r.luckyNum}  |  ${r.luckyDir}`, 60, almY + 76);
+
+      // Footer
+      ctx.fillStyle = '#64748b';
+      ctx.font = '14px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('CYBER ORACLE v9.9 · 赛博玄学纯属图一乐 · 祝君代码无 Bug', 360, 980);
+
+      const dataUrl = canvas.toDataURL('image/png');
+      $('posterPreviewImg').src = dataUrl;
+      $('btnDownloadPoster').href = dataUrl;
+      $('posterModal').classList.remove('hidden');
+      SoundFX.playCoin();
+    }
+
+    // =========================================================================
+    // 8. Event Bindings & Init
+    // =========================================================================
+    function loadFromUrlHash() {
+      const h = window.location.hash || '';
+      if (!h.startsWith('#')) return;
+      try {
+        if (h.startsWith('#s=')) {
+          const p = decodeSharePayload(h.slice(3));
+          const bazi = computeBazi(p.d, p.h);
+          const hex = buildHexagram(p.y);
+          const elEntries = Object.entries(bazi.counts).sort((a, b) => a[1] - b[1]);
+          const rec = {
+            id: p.id || 'ORACLE-SHARE',
+            timestamp: p.ts || '分享直达',
+            name: p.n || '有缘人',
+            gender: p.g || '乾造',
+            birthDate: p.d || '2008-08-08',
+            topic: p.t || '运势',
+            question: p.q || '',
+            bazi,
+            hex,
+            cyberTitle: p.ct || '赛博道友',
+            mainVerdict: p.v || hex.poem,
+            weakestEl: elEntries[0][0],
+            strongestEl: elEntries[elEntries.length - 1][0],
+            goodFor: p.gf || GOOD_LIST[0],
+            badFor: p.bf || BAD_LIST[0],
+            luckyColor: p.lc || '琥珀金',
+            luckyNum: p.ln || '6、8',
+            luckyDir: p.ld || '正东（青龙位）',
+            kitSecret: p.ks || KIT_SECRETS[0]
+          };
+          renderResult(rec);
+          $('sharedResultBanner').classList.remove('hidden');
+          $('sharedResultText').textContent = `👀 你正在围观【${rec.name}】分享的天机签文（${rec.hex.tier}）`;
+          $('btnBackToInput').textContent = '✨ 我也要算一卦';
+        } else if (h.startsWith('#m=')) {
+          const p = decodeSharePayload(h.slice(3));
+          $('tabMatch').click();
+          $('matchNameA').value = p.a;
+          $('matchDateA').value = p.da;
+          $('matchNameB').value = p.b;
+          $('matchDateB').value = p.db;
+          $('matchRelation').value = p.r;
+          $('matchPairNames').textContent = `${p.a} × ${p.b}`;
+          $('matchDuoTitle').textContent = `${p.tag}（${p.r}）`;
+          $('matchScoreText').textContent = `${p.sc}%`;
+          $('matchScoreBar').style.width = `${p.sc}%`;
+          $('matchPillarsRow').innerHTML = `
+            <div class="p-3 rounded-xl bg-black/35 border border-white/10"><div class="text-amber-300 font-bold mb-1">${p.a} · 属${p.zA}</div><div class="text-slate-300">日主：<span class="text-amber-200 font-semibold">${p.elA}</span> · ${p.nA}命</div></div>
+            <div class="p-3 rounded-xl bg-black/35 border border-white/10"><div class="text-cyan-300 font-bold mb-1">${p.b} · 属${p.zB}</div><div class="text-slate-300">日主：<span class="text-cyan-200 font-semibold">${p.elB}</span> · ${p.nB}命</div></div>
+          `;
+          $('matchVerdict').textContent = p.v;
+          $('matchResultCard').classList.remove('hidden');
+          $('sharedMatchBanner').classList.remove('hidden');
+          $('sharedMatchText').textContent = `👀 正在围观【${p.a} × ${p.b}】的合盘结果（${p.sc}%）`;
+          state.lastMatchData = p;
+        } else if (h.startsWith('#d=')) {
+          const p = decodeSharePayload(h.slice(3));
+          $('tabDecide').click();
+          $('decideInput').value = p.th;
+          $('decideResultCard').classList.remove('hidden');
+          $('decideEcho').textContent = `👀 正在围观好友问卜：「${p.th}」`;
+          $('decideCupType').textContent = p.cl;
+          $('decideCupType').className = `inline-flex items-center gap-1.5 text-xs font-mono-tech px-2.5 py-1 rounded-full border mb-2 ${p.cc}`;
+          $('decideVerdictTitle').textContent = p.ti;
+          $('decideConfidence').textContent = p.cf;
+          $('decideComment').textContent = p.cm;
+          $('decideTiming').textContent = p.tm;
+          $('decideBackup').textContent = p.bk;
+          state.lastDecideData = p;
+        }
+      } catch (e) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initParticles();
+      renderYaoPreview();
+      renderHistoryList();
+      renderMerit();
+      loadFromUrlHash();
+
+      function switchModeTab(activeId) {
+        const tabs = {
+          tabSingle: 'bg-amber-400 text-slate-950',
+          tabMatch: 'bg-cyan-400 text-slate-950',
+          tabDecide: 'bg-rose-400 text-slate-950'
+        };
+        Object.keys(tabs).forEach(id => {
+          $(id).className = `px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${id === activeId ? tabs[id] : 'text-slate-300 hover:text-white'}`;
+        });
+        ['viewInput', 'viewRitual', 'viewResult', 'viewMatch', 'viewDecide'].forEach(v => $(v).classList.add('hidden'));
+        if (activeId === 'tabSingle') $('viewInput').classList.remove('hidden');
+        if (activeId === 'tabMatch') $('viewMatch').classList.remove('hidden');
+        if (activeId === 'tabDecide') $('viewDecide').classList.remove('hidden');
+        SoundFX.playTick();
+      }
+
+      $('tabSingle').addEventListener('click', () => switchModeTab('tabSingle'));
+      $('tabMatch').addEventListener('click', () => switchModeTab('tabMatch'));
+      $('tabDecide').addEventListener('click', () => switchModeTab('tabDecide'));
+
+      // Decide / Bwei Divination
+      let tripleStreak = 0;
+      let lastDecideText = '';
+
+      document.querySelectorAll('.decide-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+          $('decideInput').value = btn.dataset.preset;
+          SoundFX.playTick();
+        });
+      });
+
+      $('decideRule').addEventListener('change', () => {
+        tripleStreak = 0;
+        $('tripleCount').textContent = '0 / 3';
+        if ($('decideRule').value === 'triple') {
+          $('tripleTracker').classList.remove('hidden');
+        } else {
+          $('tripleTracker').classList.add('hidden');
+        }
+      });
+
+      function styleBweiBlock(el, isYang) {
+        el.classList.remove('coin-flipping');
+        void el.offsetWidth;
+        el.classList.add('coin-flipping');
+        if (isYang) {
+          el.className = 'w-24 h-14 rounded-full bg-gradient-to-br from-rose-600 to-rose-900 border-2 border-amber-400/70 flex items-center justify-center shadow-lg shadow-rose-500/25 coin-flipping';
+          el.querySelector('span').textContent = '阳面';
+          el.querySelector('span').className = 'font-serif-cn text-sm font-bold text-amber-200';
+        } else {
+          el.className = 'w-24 h-14 rounded-full bg-gradient-to-br from-slate-800 to-slate-950 border-2 border-cyan-400/40 flex items-center justify-center shadow-lg coin-flipping';
+          el.querySelector('span').textContent = '阴面';
+          el.querySelector('span').className = 'font-serif-cn text-sm font-bold text-cyan-200';
+        }
+      }
+
+      function renderDecideOutcome(cup, thing, isTripleWin) {
+        const card = $('decideResultCard');
+        card.classList.remove('hidden');
+        $('decideEcho').textContent = `所问之事：「${thing}」`;
+
+        const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+        const isFood = /吃|夜宵|炸鸡|奶茶|火锅|烧烤|点餐|饿/.test(thing);
+        const isLove = /表白|消息|发给|约|喜欢|前任|聊天|恋爱/.test(thing);
+        const isBuy = /买|剁手|下单|花钱|购物车|充值|抽卡|氪金/.test(thing);
+        const isWork = /代码|肝|摸鱼|熬夜|游戏|开黑|学习|复习|写/.test(thing);
+
+        let cupLabel = '', cupCls = '', title = '', conf = '', comment = '', timing = '', backup = '';
+        if (cup === 'sheng') {
+          cupLabel = isTripleWin ? '🔥 三连圣杯 · 天道力挺' : '✅ 圣杯（一阳一阴 · 阴阳相合）';
+          cupCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30';
+          title = isTripleWin ? '天命所归 · 立刻去干！' : pick(['天机准奏 · 可以去做！', '绿灯全开 · 放手一搏！', '卦象大顺 · 冲就完事！']);
+          conf = isTripleWin ? '99%' : (84 + Math.floor(Math.random() * 13)) + '%';
+
+          if (isFood) {
+            comment = pick([
+              '食神星高照！今天天道特批免除你的卡路里愧疚感，吃饱了才有力气面对明天，点单吧！',
+              '肠胃宫显示「急需投喂」，这顿吃了不仅解馋还能回满精神值，别委屈自己了。'
+            ]);
+          } else if (isLove) {
+            comment = pick([
+              '红鸾星给你开了个后门！主动一点不仅不丢人，反而很容易收获意想不到的好反馈，发过去吧！',
+              '别在对话框里打字删字折磨自己了，直球往往比弯弯绕绕更有效，趁现在语气自然赶紧发！'
+            ]);
+          } else if (isBuy) {
+            comment = pick([
+              '财帛宫批注：「千金难买我乐意」！只要在预算内且不是三分钟热度，拿下它能快乐一整周。',
+              '物欲与实用性难得达成一致，早买早享受，冲！'
+            ]);
+          } else if (isWork) {
+            comment = pick([
+              '文昌与精力值同时在线！顺着此刻的念头直接干，效率比平时硬逼自己高出两倍。',
+              '阴阳相合之象，无论肝正事还是适度放松，今天都能拿捏住节奏，不会翻车！'
+            ]);
+          } else {
+            comment = pick([
+              '阴阳调和，气运顺畅！既然你心里已经偏向想做，天道也给你开了绿灯——别再反复内耗了，直接动手！',
+              '玄机子掐指一算：这事儿成算颇高，就算过程有点小波折也能顺手化解，干就完了。',
+              '犹豫就会败北，果断就有白给的快乐！天时地利都在你这边，大胆往前迈一步。',
+              '天机显示「先动者得先机」，再等下去灵感和热情都要凉了，现在就是最佳窗口期！'
+            ]);
+          }
+          timing = pick(['就是现在，或未来 2 小时内最宜出手', '趁热打铁，半小时内行动效果最佳', '今日傍晚前完成最顺手']);
+          backup = pick(['万一结果不如预期，就当攒了一波赛博经验值，绝不亏。', '给自己设个止损小底线，干完不管成败都痛快翻篇。']);
+        } else if (cup === 'xiao') {
+          cupLabel = '😄 笑杯（两面皆阳 · 神明笑而不语）';
+          cupCls = 'bg-amber-500/15 text-amber-300 border-amber-400/30';
+          title = pick(['神明笑了 · 先等等看', '时机未熟 · 换个问法再试', '天道吃瓜中 · 暂缓半步']);
+          conf = (48 + Math.floor(Math.random() * 14)) + '%';
+          comment = pick([
+            '玄机子看了一眼笑杯：这事儿其实你自己心里早就有答案了，只是想找个神明替你背锅。先晾它十分钟再决定！',
+            '两面皆阳，说明你现在的念头太满、情绪偏急。喝口水冷静三分钟，换个更具体的条件重新问一遍。',
+            '神明表示「这题超纲了，你自己看着办吧」——其实做与不做各有利弊，选那个明天醒来不会后悔的选项。',
+            '局势还在摇摆期，现在出手既不算好也不算坏。不如先去干点别的小事转移注意力，答案一会儿自己会浮出来。'
+          ]);
+          timing = pick(['先缓 15～30 分钟，喝口水冷静一下', '等手头另一件事忙完再回来看', '睡一觉明天早上再做最终拍板']);
+          backup = pick(['如果半小时后你还是特别想做，那就按你的心意去干！', '把利弊在备忘录写两行，瞬间就能看清值不值得。']);
+        } else {
+          cupLabel = '🛑 阴杯（两面皆阴 · 神明摇头）';
+          cupCls = 'bg-rose-500/15 text-rose-300 border-rose-400/30';
+          title = pick(['红灯警报 · 今日不宜，建议止步！', '天道亮起红牌 · 赶紧撤回念头', '玄机子拦住了你 · 先别冲动！']);
+          conf = (12 + Math.floor(Math.random() * 22)) + '%';
+          if (isFood) {
+            comment = '食神今天休假中！这顿吃下去大概率会撑到睡不着，或者外卖送来味道不如预期——听劝，喝杯温水早点睡！';
+          } else if (isBuy) {
+            comment = '钱包守护神紧急上线！这波明显属于情绪性消费，放进购物车冷静 24 小时，明天你多半会感谢今天没下单的自己。';
+          } else if (isLove) {
+            comment = '沟通宫今日信号不佳，容易发错话或者会错意。先忍住别冲动发出去，等双方心情都松弛的时候再聊更稳！';
+          } else {
+            comment = pick([
+              '天机显示此举暗藏小坑（比如容易冲动后悔、熬夜伤身或白忙一场）。听玄机子一句劝，今天按下暂停键！',
+              '两面皆阴，主「事倍功半」。硬着头皮去做不仅耗神，结果大概率也不太理想，不如把精力省下来留给明天。',
+              '玄机子一把按住你的手：冷静！这波属于典型「上头期决策」，现在去干明天一定会拍大腿。'
+            ]);
+          }
+          timing = pick(['建议改日再议，今晚早点歇着', '至少冷静 24 小时后再重新评估', '本周内暂缓执行，静待更好时机']);
+          backup = pick(['用省下来的时间/预算去干点别的快乐小事，同样美滋滋。', '立刻起身去洗把脸或听首歌，把这股冲动劲儿散掉就赢了。']);
+        }
+
+        $('decideCupType').textContent = cupLabel;
+        $('decideCupType').className = `inline-flex items-center gap-1.5 text-xs font-mono-tech px-2.5 py-1 rounded-full border mb-2 ${cupCls}`;
+        $('decideVerdictTitle').textContent = title;
+        $('decideConfidence').textContent = conf;
+        $('decideComment').textContent = comment;
+        $('decideTiming').textContent = timing;
+        $('decideBackup').textContent = backup;
+
+        state.lastDecideData = { th: thing, cl: cupLabel, cc: cupCls, ti: title, cf: conf, cm: comment, tm: timing, bk: backup };
+        lastDecideText = `【天机终端 · 赛博掷圣杯】\n所问：${thing}\n结果：${cupLabel}\n结论：${title}（执行指数 ${conf}）\n批注：${comment}`;
+      }
+
+      function executeThrowBwei(charged) {
+        const thing = $('decideInput').value.trim() || '眼前这件纠结的小事';
+        const rule = $('decideRule').value;
+        const leftYang = Math.random() >= 0.5;
+        const rightYang = Math.random() >= 0.5;
+
+        SoundFX.playBwei();
+        styleBweiBlock($('bweiLeft'), leftYang);
+        styleBweiBlock($('bweiRight'), rightYang);
+
+        const cup = (leftYang !== rightYang) ? 'sheng' : (leftYang ? 'xiao' : 'yin');
+
+        if (rule === 'triple') {
+          if (cup === 'sheng') {
+            tripleStreak++;
+            $('tripleCount').textContent = `${tripleStreak} / 3`;
+            if (tripleStreak >= 3) {
+              $('bweiStatusLabel').textContent = '🔥 三连圣杯达成！天命已定！';
+              SoundFX.playReveal();
+              renderDecideOutcome('sheng', thing, true);
+              tripleStreak = 0;
+              $('tripleCount').textContent = '0 / 3';
+            } else {
+              $('bweiStatusLabel').textContent = `✅ 第 ${tripleStreak} 杯为圣杯！请继续掷下一杯`;
+              $('decideResultCard').classList.add('hidden');
+            }
+          } else {
+            tripleStreak = 0;
+            $('tripleCount').textContent = '0 / 3';
+            $('bweiStatusLabel').textContent = cup === 'xiao' ? '😄 笑杯打断连击，可再试或看断语' : '🛑 阴杯打断连击！';
+            renderDecideOutcome(cup, thing, false);
+          }
+        } else {
+          $('bweiStatusLabel').textContent = (charged ? '✨ 蓄力掷出' : '') + (cup === 'sheng' ? '✅ 圣杯！' : cup === 'xiao' ? '😄 笑杯！' : '🛑 阴杯！');
+          if (cup === 'sheng') SoundFX.playReveal();
+          renderDecideOutcome(cup, thing, false);
+        }
+      }
+
+      bindChargeAction({
+        btnId: 'btnThrowBwei',
+        barId: 'bweiChargeBar',
+        targetsFn: () => [$('bweiLeft'), $('bweiRight')],
+        onTrigger: executeThrowBwei
+      });
+
+      $('btnResetDecide').addEventListener('click', () => {
+        $('decideInput').value = '';
+        $('decideResultCard').classList.add('hidden');
+        tripleStreak = 0;
+        $('tripleCount').textContent = '0 / 3';
+        $('bweiStatusLabel').textContent = '准备就绪 · 点击右侧掷出圣杯';
+        SoundFX.playTick();
+      });
+
+      $('btnCopyDecide').addEventListener('click', () => {
+        if (!lastDecideText) return;
+        const ta = document.createElement('textarea');
+        ta.value = lastDecideText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('📋 决断结果已复制，甩进群里让天意背锅！'); }
+        catch (e) { showToast('复制失败，请手动截图'); }
+        document.body.removeChild(ta);
+      });
+
+      $('btnMerit').addEventListener('click', () => {
+        meritTotal++;
+        renderMerit();
+        SoundFX.playWoodfish();
+        SoundFX.vibrate(12);
+        try { localStorage.setItem('cyber_oracle_merit_v1', String(meritTotal)); } catch (e) {}
+        if (meritTotal % 10 === 0) {
+          showToast(`🪵 功德已满 ${meritTotal} 点，今日水逆退散！`);
+        }
+      });
+
+      $('btnStartMatch').addEventListener('click', runDuoMatch);
+      $('btnShareResult').addEventListener('click', () => {
+        const r = state.currentResult;
+        if (!r) return;
+        const url = buildShareUrl('s', {
+          id: r.id, ts: r.timestamp, n: r.name, g: r.gender, d: r.birthDate,
+          h: $('inputBirthHour').value, t: r.topic, q: r.question, y: r.hex.yaos,
+          ct: r.cyberTitle, v: r.mainVerdict, gf: r.goodFor, bf: r.badFor,
+          lc: r.luckyColor, ln: r.luckyNum, ld: r.luckyDir, ks: r.kitSecret
+        });
+        copyTextSafe(url, '🔗 分享链接已复制！朋友点开就能直接围观你的签文');
+      });
+
+      $('btnPlayOwnSingle').addEventListener('click', () => {
+        $('sharedResultBanner').classList.add('hidden');
+        $('btnBackToInput').click();
+      });
+
+      $('btnShareMatch').addEventListener('click', () => {
+        if (!state.lastMatchData) return;
+        const url = buildShareUrl('m', state.lastMatchData);
+        copyTextSafe(url, '🔗 合盘分享链接已复制！快甩进群里让大伙围观');
+      });
+
+      $('btnPlayOwnMatch').addEventListener('click', () => {
+        $('sharedMatchBanner').classList.add('hidden');
+        $('matchResultCard').classList.add('hidden');
+        $('matchNameA').value = '';
+        $('matchNameB').value = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      $('btnShareDecide').addEventListener('click', () => {
+        if (!state.lastDecideData) return;
+        const url = buildShareUrl('d', state.lastDecideData);
+        copyTextSafe(url, '🔗 决断链接已复制！发给朋友看看天意怎么判');
+      });
+
+      $('btnCopyMatch').addEventListener('click', () => {
+        if (!lastMatchText) return;
+        const ta = document.createElement('textarea');
+        ta.value = lastMatchText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('📋 合盘结果已复制，快去艾特你的朋友！'); }
+        catch (e) { showToast('复制失败，请手动截图'); }
+        document.body.removeChild(ta);
+      });
+
+      $('btnPosterModal').addEventListener('click', generatePoster);
+      $('btnClosePoster').addEventListener('click', () => {
+        $('posterModal').classList.add('hidden');
+      });
+
+      // Topic buttons
+      document.querySelectorAll('.topic-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.topic = btn.dataset.topic;
+          document.querySelectorAll('.topic-btn').forEach(b => {
+            b.className = 'topic-btn px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer bg-white/5 border-white/10 text-slate-300 hover:bg-white/10';
+          });
+          btn.className = 'topic-btn px-3 py-2 rounded-xl text-xs font-medium border transition cursor-pointer bg-amber-400/15 border-amber-400 text-amber-200';
+          SoundFX.playTick();
+        });
+      });
+
+      function bindChargeAction({ btnId, barId, targetsFn, onTrigger }) {
+        const btn = $(btnId);
+        const bar = $(barId);
+        let timer = null;
+        let pct = 0;
+        let active = false;
+
+        const stopVisuals = () => {
+          clearInterval(timer);
+          timer = null;
+          bar.style.width = '0%';
+          targetsFn().forEach(el => el && el.classList.remove('charging-shake'));
+        };
+
+        const startHold = e => {
+          if (e.button && e.button !== 0) return;
+          active = true;
+          pct = 0;
+          SoundFX.init();
+          SoundFX.vibrate(14);
+          targetsFn().forEach(el => el && el.classList.add('charging-shake'));
+          timer = setInterval(() => {
+            if (!active) return;
+            pct = Math.min(100, pct + 8);
+            bar.style.width = pct + '%';
+            if (pct % 24 === 0) {
+              SoundFX.playChargeStep(pct);
+              SoundFX.vibrate(10);
+            }
+          }, 45);
+        };
+
+        const releaseHold = () => {
+          if (!active) return;
+          const charged = pct >= 60;
+          active = false;
+          stopVisuals();
+          SoundFX.vibrate(charged ? [28, 35, 45] : 22);
+          onTrigger(charged);
+        };
+
+        const cancelHold = () => {
+          if (!active) return;
+          active = false;
+          stopVisuals();
+        };
+
+        btn.addEventListener('pointerdown', startHold);
+        btn.addEventListener('pointerup', releaseHold);
+        btn.addEventListener('pointerleave', cancelHold);
+        btn.addEventListener('pointercancel', cancelHold);
+        btn.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            SoundFX.vibrate(22);
+            onTrigger(false);
+          }
+        });
+      }
+
+      bindChargeAction({
+        btnId: 'btnCastOnce',
+        barId: 'castChargeBar',
+        targetsFn: () => [0, 1, 2].map(i => $('coin' + i)),
+        onTrigger: charged => {
+          castSingleYao();
+          if (charged && state.castYaos.length <= 6) {
+            showToast('✨ 灵力蓄满！这一爻掷得格外清脆');
+          }
+        }
+      });
+
+      $('btnCastAuto').addEventListener('click', () => {
+        SoundFX.vibrate([18, 25, 35]);
+        castAllYaos();
+      });
+      $('btnResetCast').addEventListener('click', () => {
+        state.castYaos = [];
+        renderYaoPreview();
+        SoundFX.playTick();
+      });
+
+      $('btnStartDivine').addEventListener('click', startDivination);
+
+      $('btnQuickFill').addEventListener('click', () => {
+        const names = ['赛博道友', '熬夜冠军', '江南剑客', '摸鱼散仙'];
+        $('inputName').value = names[Math.floor(Math.random() * names.length)];
+        const yr = 2002 + Math.floor(Math.random() * 8);
+        const mo = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+        const dy = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+        $('inputBirthDate').value = `${yr}-${mo}-${dy}`;
+        $('inputBirthHour').value = String(Math.floor(Math.random() * 12));
+        castAllYaos();
+      });
+
+      $('btnBackToInput').addEventListener('click', () => {
+        state.castYaos = [];
+        renderYaoPreview();
+        $('viewResult').classList.add('hidden');
+        $('viewInput').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      $('btnOpenKit').addEventListener('click', () => {
+        SoundFX.playCoin();
+        $('kitContent').classList.remove('hidden');
+        $('btnOpenKit').textContent = '已拆封';
+        $('btnOpenKit').disabled = true;
+      });
+
+      $('btnCopyResult').addEventListener('click', () => {
+        const r = state.currentResult;
+        if (!r) return;
+        const text = [
+          `【天机终端 · 赛博算命局】`,
+          `缘主：${r.name}（${r.cyberTitle}）`,
+          `八字：${r.bazi.pillars.map(p => p.stem + p.branch).join(' ')} | ${r.bazi.nayin}命`,
+          `卦象：${r.hex.name}【${r.hex.tier}】`,
+          `玄机子批语：${r.mainVerdict}`,
+          `今日宜：${r.goodFor}`,
+          `今日忌：${r.badFor}`,
+          `幸运色：${r.luckyColor} | 幸运数：${r.luckyNum}`
+        ].join('\n');
+
+        const fallbackCopy = () => {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); showToast('📋 签文已复制，快去群里发给大伙乐呵乐呵！'); }
+          catch (e) { showToast('复制失败，请手动截图分享'); }
+          document.body.removeChild(ta);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text)
+            .then(() => showToast('📋 签文已复制，快去群里发给大伙乐呵乐呵！'))
+            .catch(fallbackCopy);
+        } else {
+          fallbackCopy();
+        }
+      });
+
+      $('btnSoundToggle').addEventListener('click', () => {
+        SoundFX.muted = !SoundFX.muted;
+        $('soundIcon').textContent = SoundFX.muted ? '🔇' : '🔊';
+        $('soundLabel').textContent = SoundFX.muted ? '已静音' : '清音开';
+        if (!SoundFX.muted) SoundFX.playTick();
+      });
+
+      $('btnHistoryToggle').addEventListener('click', () => {
+        $('historyDrawer').classList.toggle('hidden');
+      });
+
+      $('btnClearHistory').addEventListener('click', () => {
+        state.history = [];
+        saveHistory();
+        renderHistoryList();
+        showToast('往期卦录已清空');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,16 +1,8 @@
-&lt;div align=&quot;center&quot;&gt;
-
 # ☯️ 天机终端 · 赛博算命局 (Cyber Oracle)
 
-**新中式赛博玄学互动网页 — 干支八字排盘 · 六爻手摇铜钱 · 双人合盘 · 掷圣杯决断**
+> 新中式赛博玄学互动网页 — 干支八字排盘 · 六爻手摇铜钱 · 双人合盘 · 掷圣杯决断
 
-[Live Demo](https://www.google.com/search?q=https://xiaoxiaoyiiii.github.io/cyber-oracle/)
-[](https://github.com/xiaoxiaoyiiii/cyber-oracle)
-[GitHub Stars](https://www.google.com/search?q=https://github.com/xiaoxiaoyiiii/cyber-oracle/stargazers)
-
-👉 **[点击立即开算：https://xiaoxiaoyiiii.github.io/cyber-oracle/](https://www.google.com/search?q=https://xiaoxiaoyiiii.github.io/cyber-oracle/)**
-
-&lt;/div&gt;
+👉 **在线试玩地址**：[https://xiaoxiaoyiiii.github.io/cyber-oracle/](https://xiaoxiaoyiiii.github.io/cyber-oracle/)
 
 ---
 
@@ -48,10 +40,6 @@
 
 ---
 
-&lt;div align=&quot;center&quot;&gt;
-
-**觉得好玩的话，欢迎点一颗免费的 ⭐ Star 支持一下！**
+觉得好玩的话，欢迎点一颗免费的 ⭐ **Star** 支持一下！
 
 *免责声明：赛博玄学纯属图一乐，祝君代码无 Bug、天天上上签。*
-
-&lt;/div&gt;
